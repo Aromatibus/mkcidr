@@ -1,0 +1,20 @@
+[tool.isort]
+profile = "black"
+line_length = 79
+extend_skip_glob = [".venv","**/migrations/*"]
+
+
+[tool.black]
+# https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-format
+line-length = 79
+extend-exclude = '''
+(
+    .git
+    | .venv
+    |  migrations
+    | .mypy_cache
+    | .pytest_cache
+    | .tox
+
+)
+'''
