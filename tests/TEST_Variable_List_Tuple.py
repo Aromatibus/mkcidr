@@ -14,7 +14,7 @@ def Memory_Usage_Comparison() -> None:
     print("  1 digit     = {:>3} Bytes : {}".format(d.__sizeof__(), d))
     print("  Numeric     = {:>3} Bytes : {}".format(n.__sizeof__(), n))
     print("")
-    print("  platform maxsize (is64bits : {} / arch : {})".format(is_64bits, sys.platform))
+    print("  platform maxsize (is64bits : {} / architecture : {})".format(is_64bits, sys.platform))
     print("  int Max     = {:>3} Bytes : {}".format(n_max.__sizeof__(), n_max))
     print("  float Max   = {:>3} Bytes : {}".format(f_max.__sizeof__(), f_max))
     print("")
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     print("")
 
     MAX_RANGES = 10000000
-    TRIAL_COUNT = 10
+    TRIAL_COUNT = 5
     FUNCTIONS = [
         list_append_time,
         list_append_object_time,
