@@ -20,12 +20,7 @@ from urllib.parse import urlparse
 import requests
 from netaddr import IPAddress, IPRange, IPSet
 from requests.adapters import HTTPAdapter
-from requests.exceptions import (
-    ConnectionError,
-    HTTPError,
-    RequestException,
-    Timeout,
-)
+from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 from urllib3.util import Retry
 
 
@@ -33,9 +28,7 @@ def init_logger() -> None:
     # https://qiita.com/tag1216/items/db5adcf1ddcb67cfefc8
     handler = StreamHandler()
     handler.setLevel(INFO)
-    handler.setFormatter(
-        Formatter("[%(asctime)s] [%(threadName)s] %(message)s")
-    )
+    handler.setFormatter(Formatter("[%(asctime)s] [%(threadName)s] %(message)s"))
     logger = getLogger()
     logger.addHandler(handler)
     logger.setLevel(INFO)
@@ -43,7 +36,8 @@ def init_logger() -> None:
 
 
 def allow_downloads(allow_time_min: int, RIR_URLs: list) -> bool:
-    # Determine whether to continue based on the time(min) the file was downloaded
+    # Determine whether to continue based on the time(min)
+    # the file was downloaded
     current_time = datetime.now().timestamp()
     for rir_url in RIR_URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)
@@ -78,19 +72,13 @@ def parallel_download(RIR_URLs: list) -> bool:
             )
             return False
         except HTTPError as e:
-            getLogger().error(
-                "  http error : %s", rir_registry + " (" + str(e) + ")"
-            )
+            getLogger().error("  http error : %s", rir_registry + " (" + str(e) + ")")
             return False
         except Timeout as e:
-            getLogger().error(
-                "  timeout error : %s", rir_registry + " (" + str(e) + ")"
-            )
+            getLogger().error("  timeout error : %s", rir_registry + " (" + str(e) + ")")
             return False
         except RequestException as e:
-            getLogger().error(
-                "  download error : %s", rir_registry + " (" + str(e) + ")"
-            )
+            getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
             return False
         else:
             if response.status_code == 200:
@@ -111,9 +99,7 @@ def parallel_download(RIR_URLs: list) -> bool:
     for rir_url in RIR_URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)
         if not os.path.exists(rir_filename):
-            getLogger().error(
-                "  download error : %s", rir_filename + " (file not found)"
-            )
+            getLogger().error("  download error : %s", rir_filename + " (file not found)")
             return False
     getLogger().info("download task end")
     return True
@@ -138,9 +124,7 @@ def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
     getLogger().info("RIR to CIDR start")
     rir_ipv4_list = list
     rir_ipv6_list = list
-    rir_ipv4_list, rir_ipv6_list = extracts_ipv46_lists(
-        RIR_URLs, EXCLUDED_COUNTRIES
-    )
+    rir_ipv4_list, rir_ipv6_list = extracts_ipv46_lists(RIR_URLs, EXCLUDED_COUNTRIES)
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(rir2cidr_ipv4, rir_ipv4_list)
         executor.submit(rir2cidr_ipv6, rir_ipv6_list)
@@ -195,14 +179,10 @@ def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
         params = line.split("|")
 
         def write_cidr() -> None:
-            ipv4_cidr_path = os.path.abspath(
-                os.path.join(path_ipv4, rir_cc + ".ipv4")
-            )
+            ipv4_cidr_path = os.path.abspath(os.path.join(path_ipv4, rir_cc + ".ipv4"))
             cidr_ipv4_list.sort()
             ipv4set = IPSet(cidr_ipv4_list)
-            with open(
-                ipv4_cidr_path, "w", encoding="utf-8", newline="\n"
-            ) as file:
+            with open(ipv4_cidr_path, "w", encoding="utf-8", newline="\n") as file:
                 for cidr in ipv4set.iter_cidrs():
                     file.write(str(cidr) + "\n")
             return
@@ -229,9 +209,7 @@ def concatenate_ipv4_country_files() -> None:
     path_ipv4 = os.path.abspath(os.path.join(os.getcwd(), "ipv4"))
     file_list = glob(path_ipv4 + "/[A-Z][A-Z].ipv4")
     file_list.sort()
-    with open(
-        path_ipv4 + "/_CIDR.ipv4", "w", encoding="utf-8", newline="\n"
-    ) as outfile:
+    with open(path_ipv4 + "/_CIDR.ipv4", "w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
             country = os.path.splitext(os.path.basename(filename))[0]
             with open(filename, "r") as infile:
@@ -252,9 +230,7 @@ def rir2cidr_ipv6(rir_ipv6_list: list) -> None:
     for line in rir_ipv6_list:
 
         def write_cidr() -> None:
-            ipv6_cidr_path = os.path.abspath(
-                os.path.join(path_ipv6, rir_cc + ".ipv6")
-            )
+            ipv6_cidr_path = os.path.abspath(os.path.join(path_ipv6, rir_cc + ".ipv6"))
             cidr_ipv6_list.sort()
             ipv6set = IPSet(cidr_ipv6_list)
             with open(ipv6_cidr_path, "w") as file:
@@ -282,9 +258,7 @@ def concatenate_ipv6_country_files() -> None:
     path_ipv6 = os.path.abspath(os.path.join(os.getcwd(), "ipv6"))
     file_list = glob(path_ipv6 + "/[A-Z][A-Z].ipv6")
     file_list.sort()
-    with open(
-        path_ipv6 + "/_CIDR.ipv6", "w", encoding="utf-8", newline="\n"
-    ) as outfile:
+    with open(path_ipv6 + "/_CIDR.ipv6", "w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
             country = os.path.splitext(os.path.basename(filename))[0]
             with open(filename, "r") as infile:
@@ -295,7 +269,6 @@ def concatenate_ipv6_country_files() -> None:
 
 if __name__ == "__main__":
     # RIR: Regional Internet Registry
-    # fmt: off
     # APNIC: Asia Pacific Network Information Centre
     APNIC = "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
     # ARIN: American Registry for Internet Numbers
@@ -306,7 +279,7 @@ if __name__ == "__main__":
     LACNIC = "http://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     # AfriNIC: African Network Information Centre
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
-    # fmt: on
+
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
 
@@ -327,7 +300,7 @@ if __name__ == "__main__":
     os.chdir(WORK_DIR)
 
     start = time.time()
-    allow_time_min = 18 * 60 # 18 hours
+    allow_time_min = 18 * 60  # 18 hours
     if allow_downloads(allow_time_min, RIR_URLs):
         if not parallel_download(RIR_URLs):
             print("The download was canceled because an error occurred.")
@@ -337,9 +310,7 @@ if __name__ == "__main__":
         rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
         print("processing time : {:,.2f} sec".format(time.time() - start))
     else:
-        print(
-            "The download was canceled because the specified time has not elapsed."
-        )
+        print("The download was canceled because the specified time has not elapsed.")
     print("")
 
     sys.exit(0)

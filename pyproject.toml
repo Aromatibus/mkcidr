@@ -1,12 +1,12 @@
 [tool.isort]
 profile = "black"
-line_length = 79
+line_length = 90
 extend_skip_glob = [".venv","**/migrations/*"]
 
 
 [tool.black]
 # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-format
-line-length = 79
+line-length = 90
 extend-exclude = '''
 (
     .git

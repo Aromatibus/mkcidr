@@ -14,7 +14,11 @@ def Memory_Usage_Comparison() -> None:
     print("  1 digit     = {:>3} Bytes : {}".format(d.__sizeof__(), d))
     print("  Numeric     = {:>3} Bytes : {}".format(n.__sizeof__(), n))
     print("")
-    print("  platform maxsize (is64bits : {} / architecture : {})".format(is_64bits, sys.platform))
+    print(
+        "  platform maxsize (is64bits : {} / architecture : {})".format(
+            is_64bits, sys.platform
+        )
+    )
     print("  int Max     = {:>3} Bytes : {}".format(n_max.__sizeof__(), n_max))
     print("  float Max   = {:>3} Bytes : {}".format(f_max.__sizeof__(), f_max))
     print("")
@@ -22,8 +26,8 @@ def Memory_Usage_Comparison() -> None:
     print("  String      = {:>3} Bytes : {}".format(s.__sizeof__(), s))
     print("")
 
-    l = list
-    t = tuple
+    list_array = []
+    tuple_array = ()
     array_digit = 5
     data = "A"
     print("List and Tuple Memory Usage Comparison (Data is '{}')".format(data))
@@ -32,11 +36,11 @@ def Memory_Usage_Comparison() -> None:
     print("    List     = {:>7,} Bytes".format([].__sizeof__()))
     print("    Tuple    = {:>7,} Bytes".format(().__sizeof__()))
     for i in range(0, array_digit):
-        l = [data for x in range(0, pow(10, i))]
-        t = tuple(l)
-        print("  array digits {}".format(len((l))))
-        print("    List     = {:>7,} Bytes".format(l.__sizeof__()))
-        print("    Tuple    = {:>7,} Bytes".format(t.__sizeof__()))
+        list_array = [data for x in range(0, pow(10, i))]
+        tuple_array = tuple(list_array)
+        print("  array digits {}".format(len((list_array))))
+        print("    List     = {:>7,} Bytes".format(list_array.__sizeof__()))
+        print("    Tuple    = {:>7,} Bytes".format(tuple_array.__sizeof__()))
     return
 
 
@@ -64,6 +68,7 @@ def list_comprehensions_time(MAX_RANGES: int = 100000) -> float:
     start_time = time.time()
     list_array = [x for x in range(1, MAX_RANGES)]
     end_time = time.time() - start_time
+    list_array.clear()
     return end_time
 
 
@@ -78,14 +83,14 @@ def tuple_append_time(MAX_RANGES: int = 100000) -> float:
 
 def list_calculation_time(list_array: list) -> float:
     start_time = time.time()
-    result = sum([x for x in list_array if x % 2 == 0])
+    sum([x for x in list_array if x % 2 == 0])
     end_time = time.time() - start_time
     return end_time
 
 
 def tuple_calculation_time(tuple_array: tuple) -> float:
     start_time = time.time()
-    result = sum([x for x in tuple_array if x % 2 == 0])
+    sum([x for x in tuple_array if x % 2 == 0])
     end_time = time.time() - start_time
     return end_time
 
@@ -113,14 +118,8 @@ if __name__ == "__main__":
         for i in range(TRIAL_COUNT):
             end_time = function(MAX_RANGES)
             total_time += end_time
-            print(
-                "    Test NO.{:>2} : time {:,.5f} sec".format(i + 1, end_time)
-            )
-        print(
-            "    Average    : time {:,.5f} sec".format(
-                total_time / TRIAL_COUNT
-            )
-        )
+            print("    Test NO.{:>2} : time {:,.5f} sec".format(i + 1, end_time))
+        print("    Average    : time {:,.5f} sec".format(total_time / TRIAL_COUNT))
 
     print("")
     print("Sum only even numbers from the list and tuple arrays")

@@ -19,12 +19,7 @@ from urllib.parse import urlparse
 import requests
 import tqdm
 from requests.adapters import HTTPAdapter
-from requests.exceptions import (
-    ConnectionError,
-    HTTPError,
-    RequestException,
-    Timeout,
-)
+from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 from urllib3.util import Retry
 
 
@@ -32,9 +27,7 @@ def init_logger() -> None:
     # https://qiita.com/tag1216/items/db5adcf1ddcb67cfefc8
     handler = StreamHandler()
     handler.setLevel(INFO)
-    handler.setFormatter(
-        Formatter("[%(asctime)s] [%(threadName)s] %(message)s")
-    )
+    handler.setFormatter(Formatter("[%(asctime)s] [%(threadName)s] %(message)s"))
     logger = getLogger()
     logger.addHandler(handler)
     logger.setLevel(INFO)
@@ -42,7 +35,8 @@ def init_logger() -> None:
 
 
 def allow_downloads(allow_time_min: int, URLs: list) -> bool:
-    # Determine whether to continue based on the time(min) the file was downloaded
+    # Determine whether to continue based on the time(min)
+    # the file was downloaded
     current_time = datetime.now().timestamp()
     for rir_url in URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)
@@ -77,19 +71,13 @@ def parallel_download(URLs: list) -> bool:
             )
             return False
         except HTTPError as e:
-            getLogger().error(
-                "  http error : %s", rir_registry + " (" + str(e) + ")"
-            )
+            getLogger().error("  http error : %s", rir_registry + " (" + str(e) + ")")
             return False
         except Timeout as e:
-            getLogger().error(
-                "  timeout error : %s", rir_registry + " (" + str(e) + ")"
-            )
+            getLogger().error("  timeout error : %s", rir_registry + " (" + str(e) + ")")
             return False
         except RequestException as e:
-            getLogger().error(
-                "  download error : %s", rir_registry + " (" + str(e) + ")"
-            )
+            getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
             return False
         else:
             if response.status_code == 200:
@@ -110,9 +98,7 @@ def parallel_download(URLs: list) -> bool:
     for url in URLs:
         filename = os.path.basename(urlparse(url).path)
         if not os.path.exists(filename):
-            getLogger().error(
-                "  download error : %s", filename + " (file not found)"
-            )
+            getLogger().error("  download error : %s", filename + " (file not found)")
             return False
     getLogger().info("download task end")
     return True
@@ -240,21 +226,17 @@ if __name__ == "__main__":
     os.chdir(WORK_DIR)
 
     start = time.time()
-    allow_time_min = 18 * 60 # 18 hours
+    allow_time_min = 18 * 60  # 18 hours
     if allow_downloads(allow_time_min, RIR_URLs):
         if not parallel_download(RIR_URLs):
             print("The download was canceled because an error occurred.")
             sys.exit(1)
         print("download time : {:,.2f} sec".format(time.time() - start))
         start = time.time()
-        rir_same_checker_ipv4(
-            rir_load_reformat_ipv4(RIR_URLs, EXCLUDED_COUNTRIES)
-        )
+        rir_same_checker_ipv4(rir_load_reformat_ipv4(RIR_URLs, EXCLUDED_COUNTRIES))
         print("processing time : {:,.2f} sec".format(time.time() - start))
     else:
-        print(
-            "The download was canceled because the specified time has not elapsed."
-        )
+        print("The download was canceled because the specified time has not elapsed.")
     print("")
 
     sys.exit(0)
