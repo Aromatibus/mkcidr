@@ -192,7 +192,6 @@ def rir_same_checker_ipv4(check_list: list) -> None:
 
 if __name__ == "__main__":
     # RIR: Regional Internet Registry
-    # fmt: off
     # APNIC: Asia Pacific Network Information Centre
     APNIC = "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
     # ARIN: American Registry for Internet Numbers
@@ -203,27 +202,27 @@ if __name__ == "__main__":
     LACNIC = "http://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     # AfriNIC: African Network Information Centre
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
-    # fmt: on
+
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
 
-    WORK_DIR = "/var/ip-lists/"
-    WORK_DIR = os.path.abspath(WORK_DIR)
+    DIR_IP_LISTS = "/var/ip-lists/"
+    DIR_IP_LISTS = os.path.abspath(DIR_IP_LISTS)
 
     init_logger()
 
     print("Extract duplicate listings from RIR data")
     print("")
 
-    if not os.path.exists(WORK_DIR):
-        os.makedirs(WORK_DIR)
+    if not os.path.exists(DIR_IP_LISTS):
+        os.makedirs(DIR_IP_LISTS)
 
-    if not os.access(WORK_DIR, os.W_OK):
+    if not os.access(DIR_IP_LISTS, os.W_OK):
         print("You do not have write permission to the /var/ directory.")
         print("")
         sys.exit(1)
 
-    os.chdir(WORK_DIR)
+    os.chdir(DIR_IP_LISTS)
 
     start = time.time()
     allow_time_min = 18 * 60  # 18 hours
@@ -232,11 +231,12 @@ if __name__ == "__main__":
             print("The download was canceled because an error occurred.")
             sys.exit(1)
         print("download time : {:,.2f} sec".format(time.time() - start))
-        start = time.time()
-        rir_same_checker_ipv4(rir_load_reformat_ipv4(RIR_URLs, EXCLUDED_COUNTRIES))
-        print("processing time : {:,.2f} sec".format(time.time() - start))
     else:
         print("The download was canceled because the specified time has not elapsed.")
+
     print("")
+    start = time.time()
+    rir_same_checker_ipv4(rir_load_reformat_ipv4(RIR_URLs, EXCLUDED_COUNTRIES))
+    print("processing time : {:,.2f} sec".format(time.time() - start))
 
     sys.exit(0)

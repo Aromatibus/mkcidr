@@ -143,7 +143,7 @@ def extracts_ipv46_lists(
     for rir_url in RIR_URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)
         rir_registry = rir_filename.split("-")[1]
-        rir_path = os.path.abspath(os.path.join(DIR_IP_LISTS, rir_filename))
+        rir_path = os.path.abspath(os.path.join(WORK_DIR, rir_filename))
         with open(rir_path, "r") as file:
             for line in file:
                 if line.startswith("#"):
@@ -283,21 +283,21 @@ if __name__ == "__main__":
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
 
-    DIR_IP_LISTS = "/var/ip-lists/"
-    DIR_IP_LISTS = os.path.abspath(DIR_IP_LISTS)
+    WORK_DIR = "/var/ip-lists/"
+    WORK_DIR = os.path.abspath(WORK_DIR)
 
     init_logger()
 
     print("RIR to CIDR IP lists start")
     print("")
 
-    if not os.path.exists(DIR_IP_LISTS):
-        os.makedirs(DIR_IP_LISTS)
-    if not os.access(DIR_IP_LISTS, os.W_OK):
+    if not os.path.exists(WORK_DIR):
+        os.makedirs(WORK_DIR)
+    if not os.access(WORK_DIR, os.W_OK):
         print("You do not have write permission to the /var/ directory.")
         print("")
         sys.exit(1)
-    os.chdir(DIR_IP_LISTS)
+    os.chdir(WORK_DIR)
 
     start = time.time()
     allow_time_min = 18 * 60  # 18 hours
