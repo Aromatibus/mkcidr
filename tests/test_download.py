@@ -88,7 +88,7 @@ def parallel_download(URLs: list, max_workers: int = 0) -> bool:
     if max_workers == 0:
         max_workers = len(URLs) if len(URLs) < 5 else 5
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(download, url, URLs.index(url)) for url in URLs]
+        futures = [executor.submit(download, url, URLs.index(url) % 5) for url in URLs]
         for future in as_completed(futures):
             if not future.result():
                 return False
@@ -116,7 +116,6 @@ if __name__ == "__main__":
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
 
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
-    # RIR_URLs = [APNIC, ARIN, LACNIC, AfriNIC]
 
     WORK_DIR = "./ip-lists/"
     if not os.path.exists(WORK_DIR):

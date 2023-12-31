@@ -313,4 +313,8 @@ if __name__ == "__main__":
         print("The download was canceled because the specified time has not elapsed.")
     print("")
 
+    start = time.time()
+    rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
+    print("processing time : {:,.2f} sec".format(time.time() - start))
+
     sys.exit(0)
