@@ -15,7 +15,7 @@
 import os
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from urllib.parse import urlparse
 
 import requests
@@ -80,15 +80,22 @@ def download(url: str, position: int = 0) -> bool:
     if not os.path.exists(file_name):
         tqdm.write("Download error (file not found) : {}".format(file_name))
         return False
-    tqdm.write("Download end : {}".format(file_name))
     return True
 
 
-def parallel_download(URLs: list, max_workers: int = 0) -> bool:
-    if max_workers == 0:
-        max_workers = len(URLs) if len(URLs) < 5 else 5
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(download, url, URLs.index(url) % 5) for url in URLs]
+def parallel_download(URLs: list) -> bool:
+    MAX_THREADS = 5
+    cores = os.cpu_count()
+    cores = cores if cores is not None else 1
+    if cores > MAX_THREADS:
+        PoolExecutor = ProcessPoolExecutor(max_workers=None)
+    else:
+        PoolExecutor = ThreadPoolExecutor(max_workers=MAX_THREADS)
+    with PoolExecutor as executor:
+        futures = [
+            executor.submit(download, url=url, position=URLs.index(url) % MAX_THREADS)
+            for url in URLs
+        ]
         for future in as_completed(futures):
             if not future.result():
                 return False

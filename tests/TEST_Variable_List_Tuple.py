@@ -1,5 +1,20 @@
+import os
 import sys
 import time
+
+
+def architecture() -> None:
+    print("Python    : {}".format(sys.version))
+    print("Platform  : {}".format(sys.platform))
+    print("CPU Cores : {}".format(os.cpu_count()))
+    is64bits = sys.maxsize > 2**31-1
+    print("64bits    : {}".format(is64bits))
+    print("")
+    print("Boolean Type")
+    print("  True    : {}".format(int(True)))
+    print("  False   : {}".format(int(False)))
+    print("")
+    return
 
 
 def Memory_Usage_Comparison() -> None:
@@ -7,18 +22,12 @@ def Memory_Usage_Comparison() -> None:
     n = 1234567890
     n_max = sys.maxsize
     f_max = sys.float_info.max
-    is_64bits = sys.maxsize > 2**32
     c = "A"
     s = "ABCDEFGHIJ"
     print("Memory Usage Comparison")
     print("  1 digit     = {:>3} Bytes : {}".format(d.__sizeof__(), d))
     print("  Numeric     = {:>3} Bytes : {}".format(n.__sizeof__(), n))
     print("")
-    print(
-        "  platform maxsize (is64bits : {} / architecture : {})".format(
-            is_64bits, sys.platform
-        )
-    )
     print("  int Max     = {:>3} Bytes : {}".format(n_max.__sizeof__(), n_max))
     print("  float Max   = {:>3} Bytes : {}".format(f_max.__sizeof__(), f_max))
     print("")
@@ -41,6 +50,7 @@ def Memory_Usage_Comparison() -> None:
         print("  array digits {}".format(len((list_array))))
         print("    List     = {:>7,} Bytes".format(list_array.__sizeof__()))
         print("    Tuple    = {:>7,} Bytes".format(tuple_array.__sizeof__()))
+    print("")
     return
 
 
@@ -96,6 +106,7 @@ def tuple_calculation_time(tuple_array: tuple) -> float:
 
 
 if __name__ == "__main__":
+    architecture()
     Memory_Usage_Comparison()
     print("")
 
