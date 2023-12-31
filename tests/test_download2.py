@@ -4,6 +4,14 @@
 # RIRのIPアドレスリストのダウンロードテスト
 # 並列ダウンロードとシーケンシャルダウンロードの比較
 
+# ライブラリ「concurrent.futures」はPythonバージョン3.2以降で利用可能であり、
+# Python 3.10でテストされています。
+# https://docs.python.org/ja/3/library/concurrent.futures.html
+
+# プログレスバーの表示はライブラリ「tqdm」を利用しています。
+# https://tqdm.github.io/
+
+
 import os
 import sys
 import time
@@ -11,55 +19,92 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urlparse
 
 import requests
-from tqdm import tqdm  # https://tqdm.github.io/
+from requests.adapters import HTTPAdapter
+from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
+from tqdm import tqdm
+from urllib3.util import Retry
 
 
-def download(url: str, position: int = 0) -> None:
-    filename = os.path.basename(urlparse(url).path)
-    response = requests.get(url, stream=True)
-    file_size = int(response.headers.get("content-length", 0))
-    description = "({:0>2}) {}".format(position+1, filename).ljust(40)
-    bar_format="{desc} : {percentage:3.0f}% ({remaining}) |{bar:30}| {n_fmt} / {total_fmt} ({rate_fmt})"
-    with open(filename, "wb") as file, tqdm(
-        bar_format=bar_format,
-        position=position,
-        desc=description,
-        total=file_size,
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        dynamic_ncols=True,
-        leave =False,
-    ) as bar:
-        for data in response.iter_content(chunk_size=1024):
-            bar.update(len(data))
-            file.write(data)
-    return
+def download(url: str, position: int = 0) -> bool:
+    file_name = os.path.basename(urlparse(url).path)
+    try:
+        retry = Retry(
+            total=5,  # retry n times
+            backoff_factor=2,  # wait 1, 2, 4, 8, 16 sec
+            status_forcelist=[429, 500, 502, 503, 504],
+        )  # retry when status code is ...
+        session = requests.Session()
+        session.mount("http://", HTTPAdapter(max_retries=retry))
+        response = requests.get(url, stream=True, timeout=(15.0, 15.0))
+        session.close()
+        response.raise_for_status()
+    except ConnectionError as e:
+        print("  connection error : %s", file_name + " (" + str(e) + ")")
+        return False
+    except HTTPError as e:
+        print("  http error : %s", file_name + " (" + str(e) + ")")
+        return False
+    except Timeout as e:
+        print("  timeout error : %s", file_name + " (" + str(e) + ")")
+        return False
+    except RequestException as e:
+        print("  download error : %s", file_name + " (" + str(e) + ")")
+        return False
+    else:
+        if response.status_code == 200:
+            file_size = int(response.headers.get("content-length", 0))
+            description = "({:0>2}) {}".format(position + 1, file_name).ljust(40)
+            bar_format = "{desc} : {percentage:3.0f}% ({remaining}) |{bar:30}| {n_fmt} / {total_fmt} ({rate_fmt})"
+            with open(file_name, "wb") as file, tqdm(
+                position=position,
+                bar_format=bar_format,
+                desc=description,
+                total=file_size,
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+                dynamic_ncols=True,
+                leave=False,
+            ) as bar:
+                for data in response.iter_content(chunk_size=1024):
+                    bar.update(len(data))
+                    file.write(data)
+        else:
+            print("  download error : %s", file_name)
+            return False
+    return True
 
 
-def parallel_download(URLs: list, max_workers: int=0) -> None:
+def parallel_download(URLs: list, max_workers: int = 0) -> bool:
     if max_workers == 0:
-        max_workers=len(URLs) if len(URLs) < 5 else 5
+        max_workers = len(URLs) if len(URLs) < 5 else 5
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(download, url, URLs.index(url)) for url in URLs]
         for future in as_completed(futures):
             if not future.result():
-                return
-    #print("\n" * (max_workers+2))
-    return
-
-
-def sync_download(URLs: list) -> None:
+                return False
     for url in URLs:
-        download(url)
-    return
+        file_name = os.path.basename(urlparse(url).path)
+        if not os.path.exists(file_name):
+            print("  download error : %s", file_name + " (file not found)")
+            return False
+    return True
+
+
+def sync_download(URLs: list) -> bool:
+    futures = [download(url) for url in URLs]
+    if False in futures:
+        return False
+    for url in URLs:
+        file_name = os.path.basename(urlparse(url).path)
+        if not os.path.exists(file_name):
+            print("  download error : %s", file_name + " (file not found)")
+            return False
+    return True
 
 
 if __name__ == "__main__":
-    WORK_DIR = "./ip-list/"
-
     # RIR（地域インターネットレジストリ） IP List
-    # fmt: off
     # アジア太平洋地域:APNIC(Asia Pacific Network Information Centre)
     APNIC = "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
     # 北米地域:ARIN(American Registry for Internet Numbers)
@@ -70,11 +115,11 @@ if __name__ == "__main__":
     LACNIC = "http://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     # アフリカ地域:AfriNIC(African Network Information Centre)
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
-    # fmt: on
 
-    #RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
+    # RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     RIR_URLs = [APNIC, ARIN, LACNIC, AfriNIC]
 
+    WORK_DIR = "./ip-lists/"
     if not os.path.exists(WORK_DIR):
         os.makedirs(WORK_DIR)
     os.chdir(WORK_DIR)

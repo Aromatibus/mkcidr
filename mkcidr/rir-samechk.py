@@ -38,57 +38,56 @@ def allow_downloads(allow_time_min: int, URLs: list) -> bool:
     # Determine whether to continue based on the time(min)
     # the file was downloaded
     current_time = datetime.now().timestamp()
-    for rir_url in URLs:
-        rir_filename = os.path.basename(urlparse(rir_url).path)
-        if not os.path.exists(rir_filename):
+    for url in URLs:
+        file_name = os.path.basename(urlparse(url).path)
+        if not os.path.exists(file_name):
             return True
-        download_time = os.path.getmtime(rir_filename)
+        download_time = os.path.getmtime(file_name)
         difference_time = (current_time - download_time) / 60
         if difference_time > allow_time_min:
             return True
     return False
 
 
-def parallel_download(URLs: list) -> bool:
-    def download(url) -> bool:
-        rir_filename = os.path.basename(urlparse(url).path)
-        rir_registry = rir_filename.split("-")[1]
-        getLogger().info("download start : %s", rir_registry)
-        try:
-            retry = Retry(
-                total=5,  # retry n times
-                backoff_factor=2,  # wait 1, 2, 4, 8, 16 sec
-                status_forcelist=[429, 500, 502, 503, 504],
-            )  # retry when status code is ...
-            session = requests.Session()
-            session.mount("http://", HTTPAdapter(max_retries=retry))
-            response = requests.get(url, timeout=(15.0, 15.0))
-            session.close()
-            response.raise_for_status()
-        except ConnectionError as e:
-            getLogger().error(
-                "  connection error : %s", rir_registry + " (" + str(e) + ")"
-            )
-            return False
-        except HTTPError as e:
-            getLogger().error("  http error : %s", rir_registry + " (" + str(e) + ")")
-            return False
-        except Timeout as e:
-            getLogger().error("  timeout error : %s", rir_registry + " (" + str(e) + ")")
-            return False
-        except RequestException as e:
-            getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
-            return False
+def download(url) -> bool:
+    rir_filename = os.path.basename(urlparse(url).path)
+    rir_registry = rir_filename.split("-")[1]
+    getLogger().info("download start : %s", rir_registry)
+    try:
+        retry = Retry(
+            total=5,  # retry n times
+            backoff_factor=2,  # wait 1, 2, 4, 8, 16 sec
+            status_forcelist=[429, 500, 502, 503, 504],
+        )  # retry when status code is ...
+        session = requests.Session()
+        session.mount("http://", HTTPAdapter(max_retries=retry))
+        response = requests.get(url, timeout=(15.0, 15.0))
+        session.close()
+        response.raise_for_status()
+    except ConnectionError as e:
+        getLogger().error("  connection error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    except HTTPError as e:
+        getLogger().error("  http error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    except Timeout as e:
+        getLogger().error("  timeout error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    except RequestException as e:
+        getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    else:
+        if response.status_code == 200:
+            with open(rir_filename, "wb") as file:
+                file.write(response.content)
         else:
-            if response.status_code == 200:
-                with open(rir_filename, "wb") as file:
-                    file.write(response.content)
-            else:
-                getLogger().error("  download error : %s", rir_registry)
-                return False
-        getLogger().info("download end   : %s", rir_registry)
-        return True
+            getLogger().error("  download error : %s", rir_registry)
+            return False
+    getLogger().info("download end   : %s", rir_registry)
+    return True
 
+
+def parallel_download(URLs: list) -> bool:
     getLogger().info("download task start")
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = [executor.submit(download, url) for url in URLs]
