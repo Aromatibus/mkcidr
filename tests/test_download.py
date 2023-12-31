@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # RIRのIPアドレスリストのダウンロードテスト
@@ -116,8 +116,7 @@ if __name__ == "__main__":
     # アフリカ地域:AfriNIC(African Network Information Centre)
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
 
-    # RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
-    RIR_URLs = [APNIC, ARIN, LACNIC, AfriNIC]
+    RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
 
     WORK_DIR = "./ip-lists/"
     if not os.path.exists(WORK_DIR):
