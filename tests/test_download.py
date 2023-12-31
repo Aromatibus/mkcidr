@@ -39,27 +39,32 @@ def download(url: str, position: int = 0) -> bool:
         session.close()
         response.raise_for_status()
     except ConnectionError as e:
-        print("  connection error : %s", file_name + " (" + str(e) + ")")
+        tqdm.write("Connection error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except HTTPError as e:
-        print("  http error : %s", file_name + " (" + str(e) + ")")
+        tqdm.write("Http error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except Timeout as e:
-        print("  timeout error : %s", file_name + " (" + str(e) + ")")
+        tqdm.write("Timeout error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except RequestException as e:
-        print("  download error : %s", file_name + " (" + str(e) + ")")
+        tqdm.write("Download error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     else:
         if response.status_code == 200:
             file_size = int(response.headers.get("content-length", 0))
             description = "({:0>2}) {}".format(position + 1, file_name).ljust(40)
-            bar_format = "{desc} : {percentage:3.0f}% ({remaining}) |{bar:30}| {n_fmt} / {total_fmt} ({rate_fmt})"
+            bar_format = (
+                "{desc} : {percentage:3.0f}% ({remaining}) "
+                + "|{bar:10}|"
+                + " {n_fmt} ({rate_fmt}) / {total_fmt}"
+            )
             with open(file_name, "wb") as file, tqdm(
                 position=position,
                 bar_format=bar_format,
                 desc=description,
                 total=file_size,
+                ascii=True,
                 unit="B",
                 unit_scale=True,
                 unit_divisor=1024,
@@ -70,11 +75,12 @@ def download(url: str, position: int = 0) -> bool:
                     bar.update(len(data))
                     file.write(data)
         else:
-            print("  download error : %s", file_name)
+            tqdm.write("Download error (HTTP) : {}".format(file_name))
             return False
     if not os.path.exists(file_name):
-        print("  download error : %s", file_name + " (file not found)")
+        tqdm.write("Download error (file not found) : {}".format(file_name))
         return False
+    tqdm.write("Download end : {}".format(file_name))
     return True
 
 
@@ -110,7 +116,7 @@ if __name__ == "__main__":
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
 
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
-    RIR_URLs = [APNIC, ARIN, LACNIC, AfriNIC]
+    # RIR_URLs = [APNIC, ARIN, LACNIC, AfriNIC]
 
     WORK_DIR = "./ip-lists/"
     if not os.path.exists(WORK_DIR):
