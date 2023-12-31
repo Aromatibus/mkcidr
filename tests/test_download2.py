@@ -25,10 +25,10 @@ def download(url: str, position: int = 0) -> None:
         position=position,
         desc=description,
         total=file_size,
-        dynamic_ncols=True,
         unit="B",
         unit_scale=True,
         unit_divisor=1024,
+        dynamic_ncols=True,
         leave =False,
     ) as bar:
         for data in response.iter_content(chunk_size=1024):
@@ -37,14 +37,15 @@ def download(url: str, position: int = 0) -> None:
     return
 
 
-def parallel_download(URLs: list) -> None:
-    max_workers=len(URLs) if len(URLs) < 5 else 5
+def parallel_download(URLs: list, max_workers: int=0) -> None:
+    if max_workers == 0:
+        max_workers=len(URLs) if len(URLs) < 5 else 5
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(download, url, URLs.index(url)) for url in URLs]
         for future in as_completed(futures):
             if not future.result():
                 return
-    print("\n" * (max_workers+2))
+    #print("\n" * (max_workers+2))
     return
 
 
@@ -71,25 +72,29 @@ if __name__ == "__main__":
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
     # fmt: on
 
-    RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
+    #RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
+    RIR_URLs = [APNIC, ARIN, LACNIC, AfriNIC]
 
     if not os.path.exists(WORK_DIR):
         os.makedirs(WORK_DIR)
     os.chdir(WORK_DIR)
 
     start = time.time()
-    print("Parallel Download Start")
+    print("Parallel Download      : Start")
     parallel_download(RIR_URLs)
     process_time = time.time() - start
+    print("Parallel Download      : End")
     print("Parallel Download Time : {:,.2f} sec".format(process_time))
     print("")
 
     start = time.time()
-    print("Sync Download Start")
-    #sync_download(RIR_URLs)
+    print("Sync Download          : Start")
+    sync_download(RIR_URLs)
     process_time = time.time() - start
+    print("Sync Download          : End")
     print("Sync Download Time     : {:,.2f} sec".format(process_time))
 
+    print("")
     print("Download Complete")
 
     sys.exit(0)
