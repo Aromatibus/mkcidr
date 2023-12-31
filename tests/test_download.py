@@ -72,6 +72,9 @@ def download(url: str, position: int = 0) -> bool:
         else:
             print("  download error : %s", file_name)
             return False
+    if not os.path.exists(file_name):
+        print("  download error : %s", file_name + " (file not found)")
+        return False
     return True
 
 
@@ -83,11 +86,6 @@ def parallel_download(URLs: list, max_workers: int = 0) -> bool:
         for future in as_completed(futures):
             if not future.result():
                 return False
-    for url in URLs:
-        file_name = os.path.basename(urlparse(url).path)
-        if not os.path.exists(file_name):
-            print("  download error : %s", file_name + " (file not found)")
-            return False
     return True
 
 
@@ -95,11 +93,6 @@ def sync_download(URLs: list) -> bool:
     futures = [download(url) for url in URLs]
     if False in futures:
         return False
-    for url in URLs:
-        file_name = os.path.basename(urlparse(url).path)
-        if not os.path.exists(file_name):
-            print("  download error : %s", file_name + " (file not found)")
-            return False
     return True
 
 
@@ -117,6 +110,7 @@ if __name__ == "__main__":
     AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
 
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
+    RIR_URLs = [APNIC, ARIN, LACNIC, AfriNIC]
 
     WORK_DIR = "./ip-lists/"
     if not os.path.exists(WORK_DIR):
