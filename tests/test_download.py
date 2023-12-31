@@ -29,7 +29,7 @@ def download(url: str, position: int = 0) -> bool:
     file_name = os.path.basename(urlparse(url).path)
     try:
         retry = Retry(
-            total=5,  # retry n times
+            total=5,  # retry times
             backoff_factor=2,  # wait 1, 2, 4, 8, 16 sec
             status_forcelist=[429, 500, 502, 503, 504],
         )  # retry when status code is ...
