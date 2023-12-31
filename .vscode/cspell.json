@@ -11,6 +11,7 @@
         "infile",
         "LACNIC",
         "MDTM",
+        "ncols",
         "netaddr",
         "ripencc",
         "RIRS",
