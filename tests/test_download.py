@@ -27,6 +27,7 @@ from urllib3.util import Retry
 
 def download(url: str, position: int = 0) -> bool:
     file_name = os.path.basename(urlparse(url).path)
+    ErrorIndication = tqdm.write
     try:
         retry = Retry(
             total=5,  # retry times
@@ -39,16 +40,16 @@ def download(url: str, position: int = 0) -> bool:
         session.close()
         response.raise_for_status()
     except ConnectionError as e:
-        tqdm.write("Connection error : {}".format(file_name + " (" + str(e) + ")"))
+        ErrorIndication("Connection error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except HTTPError as e:
-        tqdm.write("Http error : {}".format(file_name + " (" + str(e) + ")"))
+        ErrorIndication("Http error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except Timeout as e:
-        tqdm.write("Timeout error : {}".format(file_name + " (" + str(e) + ")"))
+        ErrorIndication("Timeout error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except RequestException as e:
-        tqdm.write("Download error : {}".format(file_name + " (" + str(e) + ")"))
+        ErrorIndication("Download error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     else:
         if response.status_code == 200:
@@ -60,7 +61,7 @@ def download(url: str, position: int = 0) -> bool:
                 + " {n_fmt} ({rate_fmt}) / {total_fmt}"
             )
             with open(file_name, "wb") as file, tqdm(
-                position=position,
+                position=position+1, # +1 : Temporary countermeasure for tqdm display disorder.
                 bar_format=bar_format,
                 desc=description,
                 total=file_size,
@@ -75,10 +76,10 @@ def download(url: str, position: int = 0) -> bool:
                     bar.update(len(data))
                     file.write(data)
         else:
-            tqdm.write("Download error (HTTP) : {}".format(file_name))
+            ErrorIndication("Download error (HTTP) : {}".format(file_name))
             return False
     if not os.path.exists(file_name):
-        tqdm.write("Download error (file not found) : {}".format(file_name))
+        ErrorIndication("Download error (file not found) : {}".format(file_name))
         return False
     return True
 
