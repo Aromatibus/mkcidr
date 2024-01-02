@@ -14,7 +14,7 @@ import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from glob import glob
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger, handlers
 from urllib.parse import urlparse
 
 import requests
@@ -24,14 +24,19 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException, Ti
 from urllib3.util import Retry
 
 
-def init_logger() -> None:
-    # https://qiita.com/tag1216/items/db5adcf1ddcb67cfefc8
-    handler = StreamHandler()
-    handler.setLevel(INFO)
-    handler.setFormatter(Formatter("[%(asctime)s] [%(threadName)s] %(message)s"))
+def setup_logger(log_file: str="") -> None:
+    if log_file == "":
+        handler = StreamHandler()
+    else:
+        handler = FileHandler(log_file)
+    handler.setFormatter(
+        Formatter(
+            fmt="[%(asctime)s] %(threadName)s - %(message)s", datefmt="%Y/%m/%d-%H:%M:%S"
+        )
+    )
     logger = getLogger()
-    logger.addHandler(handler)
     logger.setLevel(INFO)
+    logger.addHandler(handler)
     return
 
 
@@ -125,16 +130,18 @@ def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
     rir_ipv4_list = list
     rir_ipv6_list = list
     rir_ipv4_list, rir_ipv6_list = extracts_ipv46_lists(RIR_URLs, EXCLUDED_COUNTRIES)
+    getLogger().info("converted to CIDR start")
     cores = os.cpu_count()
     cores = cores if cores is not None else 1
     MAX_THREADS = 2
     if cores > MAX_THREADS:
         PoolExecutor = ProcessPoolExecutor()
     else:
-        PoolExecutor = ThreadPoolExecutor(max_workers=MAX_THREADS)
+        PoolExecutor = ThreadPoolExecutor()
     with PoolExecutor as executor:
         executor.submit(rir2cidr_ipv4, rir_ipv4_list)
         executor.submit(rir2cidr_ipv6, rir_ipv6_list)
+    getLogger().info("converted to CIDR end")
     getLogger().info("RIR to CIDR end")
     return
 
@@ -293,16 +300,16 @@ if __name__ == "__main__":
     DIR_IP_LISTS = "/var/ip-lists/"
     DIR_IP_LISTS = os.path.abspath(DIR_IP_LISTS)
 
-    init_logger()
+    setup_logger()
 
-    print("RIR to CIDR IP lists start")
-    print("")
+    getLogger().info("RIR to CIDR IP lists start")
+    getLogger().info("")
 
     if not os.path.exists(DIR_IP_LISTS):
         os.makedirs(DIR_IP_LISTS)
     if not os.access(DIR_IP_LISTS, os.W_OK):
-        print("You do not have write permission to the /var/ directory.")
-        print("")
+        getLogger().info("You do not have write permission to the /var/ directory.")
+        getLogger().info("")
         sys.exit(1)
     os.chdir(DIR_IP_LISTS)
 
@@ -310,18 +317,18 @@ if __name__ == "__main__":
     allow_time_min = 18 * 60  # 18 hours
     if allow_downloads(allow_time_min, RIR_URLs):
         if not parallel_download(RIR_URLs):
-            print("The download was canceled because an error occurred.")
+            getLogger().info("The download was canceled because an error occurred.")
             sys.exit(1)
-        print("download time : {:,.2f} sec".format(time.time() - start))
+        getLogger().info("download time : {:,.2f} sec".format(time.time() - start))
         start = time.time()
         rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
-        print("processing time : {:,.2f} sec".format(time.time() - start))
+        getLogger().info("processing time : {:,.2f} sec".format(time.time() - start))
     else:
-        print("The download was canceled because the specified time has not elapsed.")
-    print("")
+        getLogger().info("The download was canceled because the specified time has not elapsed.")
+    getLogger().info("")
 
     start = time.time()
     rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
-    print("processing time : {:,.2f} sec".format(time.time() - start))
+    getLogger().info("processing time : {:,.2f} sec".format(time.time() - start))
 
     sys.exit(0)

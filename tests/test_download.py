@@ -86,12 +86,7 @@ def download(url: str, position: int = 0) -> bool:
 
 def parallel_download(URLs: list) -> bool:
     MAX_THREADS = 5
-    cores = os.cpu_count()
-    cores = cores if cores is not None else 1
-    if cores > MAX_THREADS:
-        PoolExecutor = ProcessPoolExecutor(max_workers=None)
-    else:
-        PoolExecutor = ThreadPoolExecutor(max_workers=MAX_THREADS)
+    PoolExecutor = ThreadPoolExecutor(max_workers=MAX_THREADS)
     with PoolExecutor as executor:
         futures = [
             executor.submit(download, url=url, position=URLs.index(url) % MAX_THREADS)
