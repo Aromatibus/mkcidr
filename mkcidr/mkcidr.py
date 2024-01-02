@@ -11,7 +11,7 @@
 import os
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from glob import glob
 from logging import INFO, Formatter, StreamHandler, getLogger
@@ -125,7 +125,14 @@ def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
     rir_ipv4_list = list
     rir_ipv6_list = list
     rir_ipv4_list, rir_ipv6_list = extracts_ipv46_lists(RIR_URLs, EXCLUDED_COUNTRIES)
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    cores = os.cpu_count()
+    cores = cores if cores is not None else 1
+    MAX_THREADS = 2
+    if cores > MAX_THREADS:
+        PoolExecutor = ProcessPoolExecutor()
+    else:
+        PoolExecutor = ThreadPoolExecutor(max_workers=MAX_THREADS)
+    with PoolExecutor as executor:
         executor.submit(rir2cidr_ipv4, rir_ipv4_list)
         executor.submit(rir2cidr_ipv6, rir_ipv6_list)
     getLogger().info("RIR to CIDR end")

@@ -7,7 +7,7 @@ def architecture() -> None:
     print("Python    : {}".format(sys.version))
     print("Platform  : {}".format(sys.platform))
     print("CPU Cores : {}".format(os.cpu_count()))
-    is64bits = sys.maxsize > 2**31-1
+    is64bits = sys.maxsize > 2**31 - 1
     print("64bits    : {}".format(is64bits))
     print("")
     print("Boolean Type")

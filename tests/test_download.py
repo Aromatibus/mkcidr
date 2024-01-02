@@ -61,7 +61,7 @@ def download(url: str, position: int = 0) -> bool:
                 + " {n_fmt} ({rate_fmt}) / {total_fmt}"
             )
             with open(file_name, "wb") as file, tqdm(
-                position=position+1, # +1 : tqdm display measures
+                position=position + 1,  # +1 : tqdm display measures
                 bar_format=bar_format,
                 desc=description,
                 total=file_size,
