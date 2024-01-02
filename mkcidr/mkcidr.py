@@ -327,8 +327,10 @@ if __name__ == "__main__":
         getLogger().info("The download was canceled because the specified time has not elapsed.")
     getLogger().info("")
 
+    #sys.exit(0)
+
     start = time.time()
     rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
     getLogger().info("processing time : {:,.2f} sec".format(time.time() - start))
 
-    sys.exit(0)
+    sys.exit(1)
