@@ -70,16 +70,7 @@ def download(rir_url) -> bool:
         response = requests.get(rir_url, timeout=(15.0, 15.0))
         session.close()
         response.raise_for_status()
-    except ConnectionError as e:
-        getLogger().error("  connection error : %s", rir_registry + " (" + str(e) + ")")
-        return False
-    except HTTPError as e:
-        getLogger().error("  http error : %s", rir_registry + " (" + str(e) + ")")
-        return False
-    except Timeout as e:
-        getLogger().error("  timeout error : %s", rir_registry + " (" + str(e) + ")")
-        return False
-    except RequestException as e:
+    except Exception as e:
         getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
         return False
     else:
