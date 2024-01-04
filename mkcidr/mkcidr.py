@@ -7,14 +7,14 @@
 # and has been tested with Python 3.10.
 # https://docs.python.org/ja/3/library/concurrent.futures.html
 
-
 import os
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from glob import glob
-from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger, handlers
+from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger
+from typing import Union
 from urllib.parse import urlparse
 
 import requests
@@ -24,7 +24,7 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException, Ti
 from urllib3.util import Retry
 
 
-def setup_logger(log_file: str="") -> None:
+def setup_logger(mode: Union[str, None] = None, log_file: str = "") -> None:
     if log_file == "":
         handler = StreamHandler()
     else:
@@ -55,51 +55,51 @@ def allow_downloads(allow_time_min: int, RIR_URLs: list) -> bool:
     return False
 
 
-def parallel_download(RIR_URLs: list) -> bool:
-    def download(rir_url) -> bool:
-        rir_filename = os.path.basename(urlparse(rir_url).path)
-        rir_registry = rir_filename.split("-")[1]
-        getLogger().info("download start : %s", rir_registry)
-        try:
-            retry = Retry(
-                total=5,  # retry n times
-                backoff_factor=2,  # wait 1, 2, 4, 8, 16 sec
-                status_forcelist=[429, 500, 502, 503, 504],
-            )  # retry when status code is ...
-            session = requests.Session()
-            session.mount("http://", HTTPAdapter(max_retries=retry))
-            response = requests.get(rir_url, timeout=(15.0, 15.0))
-            session.close()
-            response.raise_for_status()
-        except ConnectionError as e:
-            getLogger().error(
-                "  connection error : %s", rir_registry + " (" + str(e) + ")"
-            )
-            return False
-        except HTTPError as e:
-            getLogger().error("  http error : %s", rir_registry + " (" + str(e) + ")")
-            return False
-        except Timeout as e:
-            getLogger().error("  timeout error : %s", rir_registry + " (" + str(e) + ")")
-            return False
-        except RequestException as e:
-            getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
-            return False
+def download(rir_url) -> bool:
+    rir_filename = os.path.basename(urlparse(rir_url).path)
+    rir_registry = rir_filename.split("-")[1]
+    getLogger().info("download start : %s", rir_registry)
+    try:
+        retry = Retry(
+            total=5,  # retry n times
+            backoff_factor=2,  # wait 1, 2, 4, 8, 16 sec
+            status_forcelist=[429, 500, 502, 503, 504],
+        )  # retry when status code is ...
+        session = requests.Session()
+        session.mount("http://", HTTPAdapter(max_retries=retry))
+        response = requests.get(rir_url, timeout=(15.0, 15.0))
+        session.close()
+        response.raise_for_status()
+    except ConnectionError as e:
+        getLogger().error("  connection error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    except HTTPError as e:
+        getLogger().error("  http error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    except Timeout as e:
+        getLogger().error("  timeout error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    except RequestException as e:
+        getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
+        return False
+    else:
+        if response.status_code == 200:
+            with open(rir_filename, "wb") as file:
+                file.write(response.content)
         else:
-            if response.status_code == 200:
-                with open(rir_filename, "wb") as file:
-                    file.write(response.content)
-            else:
-                getLogger().error("  download error : %s", rir_registry)
-                return False
-        getLogger().info("download end   : %s", rir_registry)
-        return True
+            getLogger().error("  download error : %s", rir_registry)
+            return False
+    getLogger().info("download end   : %s", rir_registry)
+    return True
 
+
+def parallel_download(RIR_URLs: list) -> bool:
     getLogger().info("download task start")
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor() as executor:
         futures = [executor.submit(download, rir_url) for rir_url in RIR_URLs]
         for future in as_completed(futures):
             if not future.result():
+                executor.shutdown(wait=False, cancel_futures=False) # never stops
                 return False
     for rir_url in RIR_URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)
@@ -193,7 +193,7 @@ def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
         params = line.split("|")
 
         def write_cidr() -> None:
-            ipv4_cidr_path = os.path.abspath(os.path.join(path_ipv4, rir_cc + ".ipv4"))
+            ipv4_cidr_path = os.path.abspath(os.path.join(path_ipv4, rir_cc))
             cidr_ipv4_list.sort()
             ipv4set = IPSet(cidr_ipv4_list)
             with open(ipv4_cidr_path, "w", encoding="utf-8", newline="\n") as file:
@@ -221,7 +221,7 @@ def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
 
 def concatenate_ipv4_country_files() -> None:
     path_ipv4 = os.path.abspath(os.path.join(os.getcwd(), "ipv4"))
-    file_list = glob(path_ipv4 + "/[A-Z][A-Z].ipv4")
+    file_list = glob(path_ipv4 + "/[A-Z][A-Z]")
     file_list.sort()
     with open(path_ipv4 + "/_CIDR.ipv4", "w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
@@ -244,7 +244,7 @@ def rir2cidr_ipv6(rir_ipv6_list: list) -> None:
     for line in rir_ipv6_list:
 
         def write_cidr() -> None:
-            ipv6_cidr_path = os.path.abspath(os.path.join(path_ipv6, rir_cc + ".ipv6"))
+            ipv6_cidr_path = os.path.abspath(os.path.join(path_ipv6, rir_cc))
             cidr_ipv6_list.sort()
             ipv6set = IPSet(cidr_ipv6_list)
             with open(ipv6_cidr_path, "w") as file:
@@ -270,7 +270,7 @@ def rir2cidr_ipv6(rir_ipv6_list: list) -> None:
 
 def concatenate_ipv6_country_files() -> None:
     path_ipv6 = os.path.abspath(os.path.join(os.getcwd(), "ipv6"))
-    file_list = glob(path_ipv6 + "/[A-Z][A-Z].ipv6")
+    file_list = glob(path_ipv6 + "/[A-Z][A-Z]")
     file_list.sort()
     with open(path_ipv6 + "/_CIDR.ipv6", "w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
@@ -313,6 +313,35 @@ if __name__ == "__main__":
         sys.exit(1)
     os.chdir(DIR_IP_LISTS)
 
+
+
+
+
+
+
+    APNIC = "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest999999999"
+    ARIN = "http://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
+    RIPENCC = "http://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
+    RIR_URLs = [APNIC, ARIN, RIPENCC]
+    result = parallel_download(RIR_URLs)
+    print("")
+    print("Result({})".format(result))
+    sys.exit(1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     start = time.time()
     allow_time_min = 18 * 60  # 18 hours
     if allow_downloads(allow_time_min, RIR_URLs):
@@ -324,10 +353,12 @@ if __name__ == "__main__":
         rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
         getLogger().info("processing time : {:,.2f} sec".format(time.time() - start))
     else:
-        getLogger().info("The download was canceled because the specified time has not elapsed.")
+        getLogger().info(
+            "The download was canceled because the specified time has not elapsed."
+        )
     getLogger().info("")
 
-    #sys.exit(0)
+    sys.exit(0)
 
     start = time.time()
     rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)

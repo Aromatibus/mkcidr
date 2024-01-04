@@ -11,6 +11,7 @@
         "getsizeof",
         "infile",
         "LACNIC",
+        "levelname",
         "MDTM",
         "ncols",
         "netaddr",
