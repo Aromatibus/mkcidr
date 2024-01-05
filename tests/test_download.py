@@ -27,7 +27,7 @@ from urllib3.util import Retry
 
 def download(url: str, position: int = 0) -> bool:
     file_name = os.path.basename(urlparse(url).path)
-    ErrorIndication = tqdm.write
+    DISPLAY_MESSAGE = tqdm.write
     try:
         retry = Retry(
             total=5,  # retry times
@@ -40,16 +40,19 @@ def download(url: str, position: int = 0) -> bool:
         session.close()
         response.raise_for_status()
     except ConnectionError as e:
-        ErrorIndication("Connection error : {}".format(file_name + " (" + str(e) + ")"))
+        DISPLAY_MESSAGE("Connection error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except HTTPError as e:
-        ErrorIndication("Http error : {}".format(file_name + " (" + str(e) + ")"))
+        DISPLAY_MESSAGE("Http error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except Timeout as e:
-        ErrorIndication("Timeout error : {}".format(file_name + " (" + str(e) + ")"))
+        DISPLAY_MESSAGE("Timeout error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     except RequestException as e:
-        ErrorIndication("Download error : {}".format(file_name + " (" + str(e) + ")"))
+        DISPLAY_MESSAGE("Download error : {}".format(file_name + " (" + str(e) + ")"))
+        return False
+    except Exception as e:
+        DISPLAY_MESSAGE("Error : {}".format(file_name + " (" + str(e) + ")"))
         return False
     else:
         if response.status_code == 200:
@@ -76,10 +79,10 @@ def download(url: str, position: int = 0) -> bool:
                     bar.update(len(data))
                     file.write(data)
         else:
-            ErrorIndication("Download error (HTTP) : {}".format(file_name))
+            DISPLAY_MESSAGE("Download error (HTTP) : {}".format(file_name))
             return False
     if not os.path.exists(file_name):
-        ErrorIndication("Download error (file not found) : {}".format(file_name))
+        DISPLAY_MESSAGE("Download error (file not found) : {}".format(file_name))
         return False
     return True
 

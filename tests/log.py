@@ -9,12 +9,32 @@ from typing import Union
 
 
 def setup_logger(mode: Union[str, None] = None, log_file: str = "") -> None:
+    """Setup logger
+    %(asctime)s		# 生成時間。YYYY-MM-DD HH:MM:SS,UUU 形式。datefmtでフォーマット変更可能
+    %(created)f		# 生成時間。time.time()が返却する形式
+    %(msecs)d		# 生成時間のミリ秒部
+    %(relativeCreated)d	# logginモジュールが読み込まれてからの経過時間(ミリ秒)
+    %(levelname)s		# レベル名(DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    %(levelno)s		# レベル番号。DEBUGは10, INFOは20など
+    %(module)s		# モジュール名
+    %(pathname)s		# パス名
+    %(filename)s		# ファイル名
+    %(funcName)s		# 関数名
+    %(lineno)d		# 行番号
+    %(message)s		# ログメッセージ
+    %(name)s		# ロガー名
+    %(process)d		# プロセスID
+    %(processName)s		# プロセス名
+    %(thread)d		# スレッドID
+    %(threadName)s		# スレッド名
+    """
+
     if log_file == "":
         handler = StreamHandler()
     else:
         handler = FileHandler(log_file)
-    fmt="[%(asctime)s] %(threadName)s - %(message)s"
-    datefmt="%Y/%m/%d-%H:%M:%S"
+    fmt = "[%(asctime)s] %(threadName)s - %(message)s"
+    datefmt = "%Y/%m/%d-%H:%M:%S"
     handler.setFormatter(Formatter(fmt=fmt, datefmt=datefmt))
     logger = getLogger()
     logger.setLevel(INFO)
@@ -24,19 +44,21 @@ def setup_logger(mode: Union[str, None] = None, log_file: str = "") -> None:
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    start = time()
-    print("This is Logger test print message.")
 
+    start = time()
+    print("This is logger test print message.")
     logger = getLogger(__name__)
     logger.debug("This is DEBUG message.")
     logger.info("This is INFO message.")
     logger.warning("This is WARNING message.")
     logger.error("This is ERROR message.")
     logger.critical("This is CRITICAL message.")
-
     print("processing time : {:,.2f} sec".format(time() - start))
-    sys.exit(1)
+    print("")
 
+
+    start = time()
+    print("This is getLogger test print message.")
     setup_logger()
 
     getLogger().info("")
