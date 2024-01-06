@@ -90,7 +90,7 @@ def parallel_download(RIR_URLs: list) -> bool:
         futures = [executor.submit(download, rir_url) for rir_url in RIR_URLs]
         for future in as_completed(futures):
             if not future.result():
-                executor.shutdown(wait=False, cancel_futures=False) # never stops
+                executor.shutdown(wait=False, cancel_futures=False)  # never stops
                 return False
     for rir_url in RIR_URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)

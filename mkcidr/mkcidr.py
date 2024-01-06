@@ -90,7 +90,7 @@ def parallel_download(RIR_URLs: list) -> bool:
         futures = [executor.submit(download, rir_url) for rir_url in RIR_URLs]
         for future in as_completed(futures):
             if not future.result():
-                executor.shutdown(wait=False, cancel_futures=False) # never stops
+                executor.shutdown(wait=False, cancel_futures=False)  # never stops
                 return False
     for rir_url in RIR_URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)
@@ -148,7 +148,7 @@ def extracts_ipv46_lists(
     for rir_url in RIR_URLs:
         rir_filename = os.path.basename(urlparse(rir_url).path)
         rir_registry = rir_filename.split("-")[1]
-        rir_path = os.path.abspath(os.path.join(DIR_IP_LISTS, rir_filename))
+        rir_path = os.path.abspath(os.path.join(os.getcwd(), rir_filename))
         with open(rir_path, "r") as file:
             for line in file:
                 if line.startswith("#"):
