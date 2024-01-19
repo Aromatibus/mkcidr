@@ -1,11 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
 # -*- coding: utf-8 -*-
 
 # Convert RIR IP address lists to CIDR format
-
-# The library "concurrent.futures" is available in Python version 3.2 or later
-# and has been tested with Python 3.10.
-# https://docs.python.org/ja/3/library/concurrent.futures.html
 
 import os
 import sys
@@ -20,7 +16,6 @@ from urllib.parse import urlparse
 import requests
 from netaddr import IPAddress, IPRange, IPSet
 from requests.adapters import HTTPAdapter
-from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 from urllib3.util import Retry
 
 
