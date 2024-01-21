@@ -35,8 +35,8 @@ def Memory_Usage_Comparison() -> None:
     print("  String      = {:>3} Bytes : {}".format(s.__sizeof__(), s))
     print("")
 
-    list_array = []
-    tuple_array = ()
+    list_array = list()
+    tuple_array = tuple()
     array_digit = 5
     data = "A"
     print("List and Tuple Memory Usage Comparison (Data is '{}')".format(data))
@@ -55,7 +55,7 @@ def Memory_Usage_Comparison() -> None:
 
 
 def list_append_time(MAX_RANGES: int = 100000) -> float:
-    list_array = []
+    list_array = list()
     start_time = time.time()
     for i in range(MAX_RANGES):
         list_array.append(i)
@@ -64,7 +64,7 @@ def list_append_time(MAX_RANGES: int = 100000) -> float:
 
 
 def list_append_object_time(MAX_RANGES: int = 100000) -> float:
-    list_array = []
+    list_array = list()
     start_time = time.time()
     list_array_append = list_array.append
     for i in range(MAX_RANGES):
@@ -74,7 +74,7 @@ def list_append_object_time(MAX_RANGES: int = 100000) -> float:
 
 
 def list_comprehensions_time(MAX_RANGES: int = 100000) -> float:
-    list_array = []
+    list_array = list()
     start_time = time.time()
     list_array = [x for x in range(1, MAX_RANGES)]
     end_time = time.time() - start_time
@@ -83,7 +83,7 @@ def list_comprehensions_time(MAX_RANGES: int = 100000) -> float:
 
 
 def tuple_append_time(MAX_RANGES: int = 100000) -> float:
-    tuple_array = ()
+    tuple_array = tuple()
     start_time = time.time()
     for i in range(MAX_RANGES):
         tuple_array += (i,)
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     print("")
     print("Sum only even numbers from the list and tuple arrays")
-    list_array = []
+    list_array = list()
     list_array = [x for x in range(1, MAX_RANGES)]
 
     print("")
