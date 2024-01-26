@@ -18,6 +18,7 @@
         "msecs",
         "ncols",
         "netaddr",
+        "poolexecutor",
         "ripencc",
         "RIRS",
         "tqdm"
