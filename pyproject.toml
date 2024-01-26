@@ -18,9 +18,8 @@ convention = "google"
 # https://docs.astral.sh/ruff/rules/
 select = ["ALL"]
 ignore = [
-    # "N802", # function name should be lowercase : 関数名は小文字であるべき
-    # "N803", # argument name should be lowercase : 引数名は小文字であるべき
-    # "N806", # variable in function should be lowercase : 関数内の変数は小文字であるべき
+    "N803", # argument name should be lowercase : 引数名は小文字であるべき
+    "N806", # variable in function should be lowercase : 関数内の変数は小文字であるべき
     "D100", # Missing docstring in public module : パブリックモジュールにdocstringがない
     "D101", # Missing docstring in public class : パブリッククラスにdocstringがない
     "D102", # Missing docstring in public method : パブリックメソッドにdocstringがない
