@@ -16,11 +16,16 @@
         "loggin",
         "MDTM",
         "msecs",
+        "mypy",
         "ncols",
         "netaddr",
         "poolexecutor",
+        "pycache",
+        "pydocstyle",
         "ripencc",
         "RIRS",
-        "tqdm"
+        "tqdm",
+        "traceback",
+        "unfixable"
     ]
 }
