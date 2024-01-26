@@ -18,9 +18,9 @@ convention = "google"
 # https://docs.astral.sh/ruff/rules/
 select = ["ALL"]
 ignore = [
-    #"N802", # function name should be lowercase : 関数名は小文字であるべき
-    #"N803", # argument name should be lowercase : 引数名は小文字であるべき
-    #"N806", # variable in function should be lowercase : 関数内の変数は小文字であるべき
+    # "N802", # function name should be lowercase : 関数名は小文字であるべき
+    # "N803", # argument name should be lowercase : 引数名は小文字であるべき
+    # "N806", # variable in function should be lowercase : 関数内の変数は小文字であるべき
     "D100", # Missing docstring in public module : パブリックモジュールにdocstringがない
     "D101", # Missing docstring in public class : パブリッククラスにdocstringがない
     "D102", # Missing docstring in public method : パブリックメソッドにdocstringがない
@@ -34,7 +34,7 @@ ignore = [
     "ERA001", # Found commented-out code : コメントアウトされたコードがある
     "PLR0913", # too-many-arguments : 引数が多すぎる
     "PLC1901", # compare-to-empty-string : 空文字の比較 if a == "": を if not a: に変更
-    "PLR1711", # useless-return : 不要なreturn文 ※return Noneを削除する
+    # "PLR1711", # useless-return : 不要なreturn文 ※return Noneを削除する
     "RUF001", "RUF002", "RUF003", # ambiguous unicode character : ※全角記号の使用を禁止
 ]
 fixable = ["ALL"]
