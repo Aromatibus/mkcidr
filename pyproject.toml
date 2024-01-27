@@ -33,7 +33,7 @@ ignore = [
     "ERA001", # Found commented-out code : コメントアウトされたコードがある
     "PLR0913", # too-many-arguments : 引数が多すぎる
     "PLC1901", # compare-to-empty-string : 空文字の比較 if a == "": を if not a: に変更する
-    "PLR1711", # useless-return : 不要なreturn文を削除する ※除外すると関数間の行間フォーマットが崩れる
+    "PLR1711", # useless-return : 不要なreturn文を削除する ※除外すると関数間の行間が修正されなくなる
     "RUF001", "RUF002", "RUF003", # ambiguous unicode character : 曖昧なUNICODEの使用 ※全角記号等
 ]
 fixable = ["ALL"]
@@ -48,6 +48,7 @@ unfixable = [
 
 [tool.mypy]
 # https://mypy.readthedocs.io/en/stable/index.html
+# https://mypy.readthedocs.io/en/stable/config_file.html#example-pyproject-toml
 python_version = "3.10"
 show_traceback = "True"              # mypyがクラッシュした場合にトレースバックを表示
 error_summary = "True"               # エラーメッセージの概要を表示
