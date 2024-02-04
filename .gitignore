@@ -13,8 +13,8 @@ __pycache__/
 *.so
 
 # Batch files
-*.bat
-*.cmd
+#*.bat
+#*.cmd
 
 # Distribution / packaging
 .Python
