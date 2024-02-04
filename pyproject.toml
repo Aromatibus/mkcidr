@@ -89,7 +89,7 @@ warn_unused_ignores = "True"         # 使用されていない`# type: ignore`�
 name = "mkcidr"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Aromatibus"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
