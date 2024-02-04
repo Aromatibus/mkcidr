@@ -1,4 +1,0 @@
-netaddr
-requests
-types-requests
-tqdm
