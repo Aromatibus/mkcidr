@@ -1,16 +1,12 @@
-#!/usr/bin/env python3.10
-# -*- coding: utf-8 -*-
-
 # Convert RIR IP address lists to CIDR format
 
 import os
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
-from datetime import datetime
-from glob import glob
-from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger
-from typing import Union
+from datetime import datetime, timezone
+from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING, FileHandler, Formatter, StreamHandler, getLogger
+from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
@@ -19,39 +15,68 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
 
-def setup_logger(mode: Union[str, None] = None, log_file: str = "") -> None:
-    if log_file == "":
-        handler = StreamHandler()
-    else:
-        handler = FileHandler(log_file)
-    handler.setFormatter(
-        Formatter(
-            fmt="[%(asctime)s] %(threadName)s - %(message)s", datefmt="%Y/%m/%d-%H:%M:%S"
-        )
-    )
+def setup_logger(level: int | str = INFO, path: str = "") -> None:
+    """Setup logger.
+
+    https://docs.python.org/3/library/logging.html
+
+    優先順位
+    CRITICAL > ERROR > WARNING > INFO > DEBUG
+    "INFO"にした場合、INFO以上のログが出力される。DEBUGは出力されない
+    %(asctime)s		    # 生成時間。YYYY-MM-DD HH:MM:SS,UUU 形式。datefmtでフォーマット変更可能
+    %(created)f		    # 生成時間。time()が返却する形式
+    %(msecs)d		    # 生成時間のミリ秒部
+    %(relativeCreated)d	# logginモジュールが読み込まれてからの経過時間(ミリ秒)
+    %(levelname)s		# レベル名(DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    %(module)s		    # モジュール名
+    %(pathname)s		# パス名
+    %(filename)s		# ファイル名
+    %(funcName)s		# 関数名
+    %(lineno)d		    # 行番号
+    %(message)s		    # ログメッセージ
+    %(name)s		    # ロガー名
+    %(process)d		    # プロセスID
+    %(processName)s		# プロセス名
+    %(thread)d		    # スレッドID
+    %(threadName)s		# スレッド名
+    """
+    LEVELS = {"debug": DEBUG, "info": INFO, "warning": WARNING, "error": ERROR, "critical": CRITICAL}
+    if isinstance(level, str):
+        level = LEVELS.get(level.lower(), INFO)
+    if isinstance(level, int):
+        keys = [key for key, value in LEVELS.items() if value == int(level)]
+        level = LEVELS.get(keys[0], INFO)
     logger = getLogger()
-    logger.setLevel(INFO)
-    logger.addHandler(handler)
+    logger.setLevel(level)
+    handler = StreamHandler() if path == "" else FileHandler(path)
+    handler.setFormatter(  # type: ignore
+        Formatter(
+            fmt="[%(asctime)s] [%(threadName)s] %(message)s",
+            datefmt="%Y/%m/%d-%H:%M:%S",
+        ),
+    )
+    # https://github.com/python/mypy/issues/12690
+    logger.addHandler(handler)  # type: ignore
     return
 
 
-def allow_downloads(allow_time_min: int, RIR_URLs: list) -> bool:
+def allow_downloads(allow_time_min: int, RIR_URLs: list[str]) -> bool:
     # Determine whether to continue based on the time(min)
     # the file was downloaded
-    current_time = datetime.now().timestamp()
+    current_time = datetime.now(timezone.utc).timestamp()
     for rir_url in RIR_URLs:
-        rir_filename = os.path.basename(urlparse(rir_url).path)
-        if not os.path.exists(rir_filename):
+        rir_filename = Path(urlparse(rir_url).path).name
+        if not Path(rir_filename).exists():
             return True
-        download_time = os.path.getmtime(rir_filename)
+        download_time = Path(rir_filename).stat().st_mtime
         difference_time = (current_time - download_time) / 60
         if difference_time > allow_time_min:
             return True
     return False
 
 
-def download(rir_url) -> bool:
-    rir_filename = os.path.basename(urlparse(rir_url).path)
+def download(rir_url: str) -> bool:
+    rir_filename = Path(urlparse(rir_url).path).name
     rir_registry = rir_filename.split("-")[1]
     getLogger().info("download start : %s", rir_registry)
     try:
@@ -69,8 +94,9 @@ def download(rir_url) -> bool:
         getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
         return False
     else:
-        if response.status_code == 200:
-            with open(rir_filename, "wb") as file:
+        http_success = 200
+        if response.status_code == http_success:
+            with Path(rir_filename).open("wb") as file:
                 file.write(response.content)
         else:
             getLogger().error("  download error : %s", rir_registry)
@@ -79,7 +105,7 @@ def download(rir_url) -> bool:
     return True
 
 
-def parallel_download(RIR_URLs: list) -> bool:
+def parallel_download(RIR_URLs: list[str]) -> bool:
     getLogger().info("download task start")
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(download, rir_url) for rir_url in RIR_URLs]
@@ -88,17 +114,17 @@ def parallel_download(RIR_URLs: list) -> bool:
                 executor.shutdown(wait=False, cancel_futures=False)  # never stops
                 return False
     for rir_url in RIR_URLs:
-        rir_filename = os.path.basename(urlparse(rir_url).path)
-        if not os.path.exists(rir_filename):
+        rir_filename = Path(urlparse(rir_url).path).name
+        if not Path(rir_filename).exists():
             getLogger().error("  download error : %s", rir_filename + " (file not found)")
             return False
     getLogger().info("download task end")
     return True
 
 
-def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
-    """
-    RIR Format
+def rir2cidr(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> None:
+    """RIR Format.
+
         http://www.apnic.net/db/rir-stats-format.html
         Format     : registry|cc|type|start|value|date|status|extensions...]
         registry   : {afrinic, apnic, arin, iana, lacnic, ripencc}
@@ -113,17 +139,14 @@ def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
         https://www.asahi-net.or.jp/~ax2s-kmtn/ref/iso3166-1.html
     """
     getLogger().info("RIR to CIDR start")
-    rir_ipv4_list = list
-    rir_ipv6_list = list
+    rir_ipv4_list: list[str] = []
+    rir_ipv6_list: list[str] = []
     rir_ipv4_list, rir_ipv6_list = extracts_ipv46_lists(RIR_URLs, EXCLUDED_COUNTRIES)
     getLogger().info("converted to CIDR start")
     cores = os.cpu_count()
     cores = cores if cores is not None else 1
     MAX_THREADS = 2
-    if cores > MAX_THREADS:
-        PoolExecutor = ProcessPoolExecutor()
-    else:
-        PoolExecutor = ThreadPoolExecutor()
+    PoolExecutor = ProcessPoolExecutor() if cores > MAX_THREADS else ThreadPoolExecutor()
     with PoolExecutor as executor:
         executor.submit(rir2cidr_ipv4, rir_ipv4_list)
         executor.submit(rir2cidr_ipv6, rir_ipv6_list)
@@ -133,18 +156,17 @@ def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
 
 
 def extracts_ipv46_lists(
-    RIR_URLs: list, EXCLUDED_COUNTRIES: list
+    RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str],
 ) -> tuple[list[str], list[str]]:
-    getLogger().info("ipv4/ipv6 separate start")
-    rir_ipv4_list = list()
-    rir_ipv6_list = list()
+    rir_ipv4_list: list[str] = []
+    rir_ipv6_list: list[str] = []
     rir_ipv4_list_append = rir_ipv4_list.append
     rir_ipv6_list_append = rir_ipv6_list.append
     for rir_url in RIR_URLs:
-        rir_filename = os.path.basename(urlparse(rir_url).path)
+        rir_filename = Path(urlparse(rir_url).path).name
         rir_registry = rir_filename.split("-")[1]
-        rir_path = os.path.abspath(os.path.join(os.getcwd(), rir_filename))
-        with open(rir_path, "r") as file:
+        rir_path = Path(rir_filename).resolve()
+        with rir_path.open("r") as file:
             for line in file:
                 if line.startswith("#"):
                     continue
@@ -166,37 +188,37 @@ def extracts_ipv46_lists(
     return rir_ipv4_list, rir_ipv6_list
 
 
-def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
+def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
     getLogger().info("ipv4 converted to CIDR start")
     getLogger().info("  ipv4 RIR to CIDR start")
-    path_ipv4 = os.path.abspath(os.path.join(os.getcwd(), "ipv4"))
-    if not os.path.exists(path_ipv4):
-        os.makedirs(path_ipv4)
+    path_ipv4 = Path.cwd().resolve() / "ipv4"
+    if not path_ipv4.exists():
+        path_ipv4.mkdir()
     rir_cc = ""
-    cidr_ipv4_list = list()
+    cidr_ipv4_list: list[str] = []
     cidr_ipv4_list_extend = cidr_ipv4_list.extend
+
+    def write_cidr(path_ipv4: str, rir_cc: str) -> None:
+        ipv4_cidr_path = Path(path_ipv4).resolve() / rir_cc
+        cidr_ipv4_list.sort()
+        ipv4set = IPSet(cidr_ipv4_list)
+        with ipv4_cidr_path.open("w", encoding="utf-8", newline="\n") as file:
+            for cidr in ipv4set.iter_cidrs():
+                file.write(str(cidr) + "\n")
+        return
+
     for line in rir_ipv4_list:
         params = line.split("|")
-
-        def write_cidr() -> None:
-            ipv4_cidr_path = os.path.abspath(os.path.join(path_ipv4, rir_cc))
-            cidr_ipv4_list.sort()
-            ipv4set = IPSet(cidr_ipv4_list)
-            with open(ipv4_cidr_path, "w", encoding="utf-8", newline="\n") as file:
-                for cidr in ipv4set.iter_cidrs():
-                    file.write(str(cidr) + "\n")
-            return
-
         if rir_cc != params[0] and line != rir_ipv4_list[0]:
-            write_cidr()
+            write_cidr(str(path_ipv4), rir_cc)
             cidr_ipv4_list.clear()
         rir_cc = params[0]
         width = int(params[3])
         from_ip = IPAddress(params[2], version=4)
         to_ip = IPAddress(int(from_ip) + width - 1)
-        cidr_ipv4_list_extend(IPRange(params[2], to_ip).cidrs())
+        cidr_ipv4_list_extend(str(cidr) for cidr in IPRange(params[2], to_ip).cidrs())
         if line == rir_ipv4_list[-1]:
-            write_cidr()
+            write_cidr(str(path_ipv4), rir_cc)
     getLogger().info("  ipv4 RIR to CIDR end")
     getLogger().info("  combine ipv4 country files start")
     concatenate_ipv4_country_files()
@@ -206,46 +228,46 @@ def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
 
 
 def concatenate_ipv4_country_files() -> None:
-    path_ipv4 = os.path.abspath(os.path.join(os.getcwd(), "ipv4"))
-    file_list = glob(path_ipv4 + "/[A-Z][A-Z]")
+    path_ipv4 = Path.cwd().resolve() / "ipv4"
+    file_list = list(Path(path_ipv4).glob("[A-Z][A-Z]"))
     file_list.sort()
-    with open(path_ipv4 + "/_CIDR.ipv4", "w", encoding="utf-8", newline="\n") as outfile:
+    with Path(path_ipv4 / "_CIDR.ipv4").open("w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
-            country = os.path.splitext(os.path.basename(filename))[0]
-            with open(filename, "r") as infile:
+            country = Path(filename).name.split(".")[0]
+            with Path(filename).open("w") as infile:
                 for line in infile:
                     if line.strip() != "":
                         outfile.write(country + "\t" + line)
 
 
-def rir2cidr_ipv6(rir_ipv6_list: list) -> None:
+def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
     getLogger().info("ipv6 converted to CIDR start")
     getLogger().info("  ipv6 RIR to CIDR start")
-    path_ipv6 = os.path.abspath(os.path.join(os.getcwd(), "ipv6"))
-    if not os.path.exists(path_ipv6):
-        os.makedirs(path_ipv6)
+    path_ipv6 = Path.cwd().resolve() / "ipv6"
+    if not path_ipv6.exists():
+        path_ipv6.mkdir()
     rir_cc = ""
-    cidr_ipv6_list = list()
+    cidr_ipv6_list: list[str] = []
     cidr_ipv6_list_append = cidr_ipv6_list.append
+
+    def write_cidr(path_ipv6:str, rir_cc:str) -> None:
+        ipv6_cidr_path = Path(path_ipv6).resolve() / rir_cc
+        cidr_ipv6_list.sort()
+        ipv6set = IPSet(cidr_ipv6_list)
+        with Path(ipv6_cidr_path).open("w") as file:
+            for cidr in ipv6set.iter_cidrs():
+                file.write(str(cidr) + "\n")
+        return
+
     for line in rir_ipv6_list:
-
-        def write_cidr() -> None:
-            ipv6_cidr_path = os.path.abspath(os.path.join(path_ipv6, rir_cc))
-            cidr_ipv6_list.sort()
-            ipv6set = IPSet(cidr_ipv6_list)
-            with open(ipv6_cidr_path, "w") as file:
-                for cidr in ipv6set.iter_cidrs():
-                    file.write(str(cidr) + "\n")
-            return
-
         params = line.split("|")
         if rir_cc != params[0] and line != rir_ipv6_list[0]:
-            write_cidr()
-            cidr_ipv6_list.clear()
+            write_cidr(str(path_ipv6), rir_cc)
+            cidr_ipv6_list = []  # Clear cidr_ipv6_list
         rir_cc = params[0]
         cidr_ipv6_list_append(params[2] + "/" + params[3])
         if line == rir_ipv6_list[-1]:
-            write_cidr()
+            write_cidr(str(path_ipv6), rir_cc)
     getLogger().info("  ipv6 RIR to CIDR end")
     getLogger().info("  combine ipv6 country files start")
     concatenate_ipv6_country_files()
@@ -255,13 +277,13 @@ def rir2cidr_ipv6(rir_ipv6_list: list) -> None:
 
 
 def concatenate_ipv6_country_files() -> None:
-    path_ipv6 = os.path.abspath(os.path.join(os.getcwd(), "ipv6"))
-    file_list = glob(path_ipv6 + "/[A-Z][A-Z]")
+    path_ipv6 = Path.cwd().resolve() / "ipv6"
+    file_list = list(Path(path_ipv6).glob("[A-Z][A-Z]"))
     file_list.sort()
-    with open(path_ipv6 + "/_CIDR.ipv6", "w", encoding="utf-8", newline="\n") as outfile:
+    with Path(path_ipv6 / "_CIDR.ipv6").open("w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
-            country = os.path.splitext(os.path.basename(filename))[0]
-            with open(filename, "r") as infile:
+            country = Path(filename).name.split(".")[0]
+            with Path(filename).open() as infile:
                 for line in infile:
                     if line.strip() != "":
                         outfile.write(country + "\t" + line)
@@ -284,15 +306,15 @@ if __name__ == "__main__":
     EXCLUDED_COUNTRIES = ["ZZ"]
 
     DIR_IP_LISTS = "/var/ip-lists/"
-    DIR_IP_LISTS = os.path.abspath(DIR_IP_LISTS)
+    DIR_IP_LISTS = Path(DIR_IP_LISTS).resolve()
 
     setup_logger()
 
     getLogger().info("RIR to CIDR IP lists start")
     getLogger().info("")
 
-    if not os.path.exists(DIR_IP_LISTS):
-        os.makedirs(DIR_IP_LISTS)
+    if not Path(DIR_IP_LISTS).exists():
+        Path(DIR_IP_LISTS).mkdir(parents=True)
     if not os.access(DIR_IP_LISTS, os.W_OK):
         getLogger().info("You do not have write permission to the /var/ directory.")
         getLogger().info("")
@@ -305,20 +327,19 @@ if __name__ == "__main__":
         if not parallel_download(RIR_URLs):
             getLogger().info("The download was canceled because an error occurred.")
             sys.exit(1)
-        getLogger().info("download time : {:,.2f} sec".format(time.time() - start))
+        getLogger().info(f"download time : {time.time() - start:,.2f} sec")
         start = time.time()
         rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
-        getLogger().info("processing time : {:,.2f} sec".format(time.time() - start))
+        getLogger().info(f"processing time : {time.time() - start:,.2f} sec")
     else:
         getLogger().info(
-            "The download was canceled because the specified time has not elapsed."
+            "The download was canceled because the specified time has not elapsed.",
         )
     getLogger().info("")
 
-    sys.exit(0)
-
+    # sys.exit(0)
+    # Debug test code
     start = time.time()
     rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
-    getLogger().info("processing time : {:,.2f} sec".format(time.time() - start))
-
+    getLogger().info(f"processing time : {time.time() - start:,.2f} sec")
     sys.exit(1)
