@@ -155,9 +155,7 @@ def rir2cidr(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> None:
     return
 
 
-def extracts_ipv46_lists(
-    RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str],
-) -> tuple[list[str], list[str]]:
+def extracts_ipv46_lists(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> tuple[list[str], list[str]]:
     rir_ipv4_list: list[str] = []
     rir_ipv6_list: list[str] = []
     rir_ipv4_list_append = rir_ipv4_list.append
@@ -238,6 +236,7 @@ def concatenate_ipv4_country_files() -> None:
                 for line in infile:
                     if line.strip() != "":
                         outfile.write(country + "\t" + line)
+    return
 
 
 def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
@@ -287,6 +286,7 @@ def concatenate_ipv6_country_files() -> None:
                 for line in infile:
                     if line.strip() != "":
                         outfile.write(country + "\t" + line)
+    return
 
 
 if __name__ == "__main__":
