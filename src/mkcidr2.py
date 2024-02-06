@@ -244,7 +244,7 @@ def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
     cidr_ipv6_list: list[str] = []
     cidr_ipv6_list_append = cidr_ipv6_list.append
 
-    def write_cidr(path_ipv6:str, rir_cc:str) -> None:
+    def write_cidr(path_ipv6: str, rir_cc: str) -> None:
         ipv6_cidr_path = Path(path_ipv6).resolve() / rir_cc
         cidr_ipv6_list.sort()
         ipv6set = IPSet(cidr_ipv6_list)
@@ -313,14 +313,11 @@ if __name__ == "__main__":
         sys.exit(1)
     os.chdir(DIR_IP_LISTS)
 
-
     # Debug test code
     start = time.time()
     rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
     getLogger().info(f"processing time : {time.time() - start:,.2f} sec")
     sys.exit(1)
-
-
 
     start = time.time()
     allow_time_min = 18 * 60  # 18 hours
