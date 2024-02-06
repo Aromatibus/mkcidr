@@ -1,3 +1,37 @@
+[project]
+name = "mkcidr"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Aromatibus", email = "aromablackcoffee@yahoo.co.jp" }
+]
+dependencies = [
+    "netaddr>=0.10.1",
+    "requests>=2.31.0",
+    "types-requests>=2.31.0.20240125",
+    "tqdm>=4.66.1",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[project.scripts]
+hello = "mkcidr:hello"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mkcidr"]
+
+
 [tool.ruff]
 # https://docs.astral.sh/ruff/
 # https://docs.astral.sh/ruff/settings/
@@ -84,26 +118,3 @@ warn_return_any = "True"             # `Any`型を返す関数やメソッドに
 warn_unreachable = "True"            # 到達不能なコードに警告します
 warn_unused_configs = "True"         # 使用されていないconfigオプションに警告します
 warn_unused_ignores = "True"         # 使用されていない`# type: ignore`コメントに警告します
-
-[tool.poetry]
-name = "mkcidr"
-version = "0.1.0"
-description = ""
-authors = ["Aromatibus"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-netaddr = "^0.10.1"
-requests = "^2.31.0"
-types-requests = "^2.31.0.20240125"
-tqdm = "^4.66.1"
-
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.2.0"
-mypy = "^1.8.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
