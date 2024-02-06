@@ -10,7 +10,6 @@
 -e file:.
 certifi==2024.2.2
 charset-normalizer==3.3.2
-colorama==0.4.6
 idna==3.6
 netaddr==0.10.1
 requests==2.31.0
