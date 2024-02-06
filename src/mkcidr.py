@@ -19,7 +19,6 @@ from urllib.parse import urlparse
 import requests
 from netaddr import IPAddress, IPRange, IPSet
 from requests.adapters import HTTPAdapter
-from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 from urllib3.util import Retry
 
 
@@ -202,9 +201,9 @@ def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
 
 def concatenate_ipv4_country_files() -> None:
     path_ipv4 = Path(Path.cwd()) / "ipv4"
-    file_list = Path(path_ipv4).glob("/[A-Z][A-Z]")
+    file_list = list(Path(path_ipv4).glob("[A-Z][A-Z]"))
     file_list.sort()
-    with Path(path_ipv4 + "/_CIDR.ipv4").open(mode="w", encoding="utf-8", newline="\n") as outfile:
+    with Path(path_ipv4 / "_CIDR.ipv4").open(mode="w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
             country = Path(filename).stem[0]
             with Path(filename).open(mode="r") as infile:

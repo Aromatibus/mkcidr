@@ -57,7 +57,6 @@ def setup_logger(level: int | str = INFO, path: str = "") -> None:
     )
     # https://github.com/python/mypy/issues/12690
     logger.addHandler(handler)  # type: ignore
-    return
 
 
 def allow_downloads(allow_time_min: int, RIR_URLs: list[str]) -> bool:
@@ -152,7 +151,6 @@ def rir2cidr(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> None:
         executor.submit(rir2cidr_ipv6, rir_ipv6_list)
     getLogger().info("converted to CIDR end")
     getLogger().info("RIR to CIDR end")
-    return
 
 
 def extracts_ipv46_lists(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> tuple[list[str], list[str]]:
@@ -203,7 +201,6 @@ def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
         with ipv4_cidr_path.open("w", encoding="utf-8", newline="\n") as file:
             for cidr in ipv4set.iter_cidrs():
                 file.write(str(cidr) + "\n")
-        return
 
     for line in rir_ipv4_list:
         params = line.split("|")
@@ -222,11 +219,10 @@ def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
     concatenate_ipv4_country_files()
     getLogger().info("  combine ipv4 country files end")
     getLogger().info("ipv4 converted to CIDR end")
-    return
 
 
 def concatenate_ipv4_country_files() -> None:
-    path_ipv4 = Path.cwd().resolve() / "ipv4"
+    path_ipv4 = Path(Path.cwd()) / "ipv4"
     file_list = list(Path(path_ipv4).glob("[A-Z][A-Z]"))
     file_list.sort()
     with Path(path_ipv4 / "_CIDR.ipv4").open("w", encoding="utf-8", newline="\n") as outfile:
@@ -236,7 +232,6 @@ def concatenate_ipv4_country_files() -> None:
                 for line in infile:
                     if line.strip() != "":
                         outfile.write(country + "\t" + line)
-    return
 
 
 def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
@@ -256,7 +251,6 @@ def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
         with Path(ipv6_cidr_path).open("w") as file:
             for cidr in ipv6set.iter_cidrs():
                 file.write(str(cidr) + "\n")
-        return
 
     for line in rir_ipv6_list:
         params = line.split("|")
@@ -272,7 +266,6 @@ def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
     concatenate_ipv6_country_files()
     getLogger().info("  combine ipv6 country files end")
     getLogger().info("ipv6 converted to CIDR end")
-    return
 
 
 def concatenate_ipv6_country_files() -> None:
@@ -286,7 +279,6 @@ def concatenate_ipv6_country_files() -> None:
                 for line in infile:
                     if line.strip() != "":
                         outfile.write(country + "\t" + line)
-    return
 
 
 if __name__ == "__main__":
@@ -321,6 +313,15 @@ if __name__ == "__main__":
         sys.exit(1)
     os.chdir(DIR_IP_LISTS)
 
+
+    # Debug test code
+    start = time.time()
+    rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
+    getLogger().info(f"processing time : {time.time() - start:,.2f} sec")
+    sys.exit(1)
+
+
+
     start = time.time()
     allow_time_min = 18 * 60  # 18 hours
     if allow_downloads(allow_time_min, RIR_URLs):
@@ -337,9 +338,4 @@ if __name__ == "__main__":
         )
     getLogger().info("")
 
-    # sys.exit(0)
-    # Debug test code
-    start = time.time()
-    rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
-    getLogger().info(f"processing time : {time.time() - start:,.2f} sec")
-    sys.exit(1)
+    sys.exit(0)
