@@ -1,4 +1,8 @@
 {
+  "language": "en,ja",
+  "ignoreRegExpList": [
+    "[０-９Ａ-Ｚａ-ｚぁ-んァ-ヶ亜-熙纊-黑]+"
+  ],
     "words": [
         "ABCDEFGHIJ",
         "Afri",
