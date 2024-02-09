@@ -58,19 +58,19 @@ ignore = [
     "D10", # Missing docstring : docstringがありません
     "BLE001", # blind-except : 例外を捕捉する際に、例外の型を指定していません
     "INP001", # implicit-namespace-package : 暗黙的な名前空間パッケージを使用しています
-    #  "T20", # print found : print文があります ※loggingとは異なり誤って機密情報が含まれる可能性があります
+    "T20", # print found : print文があります ※loggingとは異なり誤って機密情報が含まれる可能性があります
     "S311", # suspicious-non-cryptographic-random-usage : 暗号学的でない乱数生成を使用しています
-    #  "PTH", # Use of the `pathlib` module is preferred over `os.path` : `os.path`よりも`pathlib`モジュールの使用が推奨されています
+    "PTH", # Use of the `pathlib` module is preferred over `os.path` : `os.path`よりも`pathlib`モジュールの使用が推奨されています
     #  "ERA001", # Found commented-out code : コメントアウトされたコードがあります
     "PGH003", # Use specific rule codes when ignoring type issues : 型の問題を無視する際に具体的なルールコードを使用します
     "PGH004", # Use specific rule codes when using noqa : noqaを使用する際に具体的なルールコードを使用します
     "PLC1901", # compare-to-empty-string : 空文字の比較 if a == "": を if not a: に変更します
-    # "PLR1711", # useless-return : 不要なreturn文です ※削除します
     "RUF001", "RUF002", "RUF003", # ambiguous unicode character : ※主に全角記号を使用禁止します
 ]
 fixable = ["ALL"]
 unfixable = [
     "F401", # unused-import : import文に未使用の名前があります ※削除します
+    "PLR1711", # useless-return : 不要なreturn文です ※削除します
 ]
 
 [tool.ruff.lint.pylint]
