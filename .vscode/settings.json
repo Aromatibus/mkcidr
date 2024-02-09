@@ -1,6 +1,5 @@
 {
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
-    },
-    "python.formatting.provider": "none"
+    }
 }
