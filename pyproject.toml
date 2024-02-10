@@ -64,13 +64,13 @@ ignore = [
     #  "ERA001", # Found commented-out code : コメントアウトされたコードがあります
     "PGH003", # Use specific rule codes when ignoring type issues : 型の問題を無視する際に具体的なルールコードを使用します
     "PGH004", # Use specific rule codes when using noqa : noqaを使用する際に具体的なルールコードを使用します
-    "PLC1901", # compare-to-empty-string : 空文字の比較 if a == "": を if not a: に変更します
-    # "PLR1711", # useless-return : 不要なreturn文です ※削除します
     "RUF001", "RUF002", "RUF003", # ambiguous unicode character : ※主に全角記号を使用禁止します
 ]
 fixable = ["ALL"]
 unfixable = [
-    "F401", # unused-import : import文に未使用の名前があります ※削除します
+    "F401", # unused-import : import文に未使用の名前があります ※削除されます
+    "PLC1901", # (preview)compare-to-empty-string : 空文字の比較 ※if a == "": を if not a: に変更されます
+    "PLR1711", # useless-return : 不要なreturn文です ※削除されます
 ]
 
 [tool.ruff.lint.pylint]
