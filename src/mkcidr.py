@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
 
 """Convert RIR IP address lists to CIDR format."""
 
@@ -24,17 +24,18 @@ from urllib3.util import Retry
 
 def setup_logger(log_file: str = "") -> None:
     handler = StreamHandler() if log_file == "" else FileHandler(log_file)
-    handler.setFormatter(
+    handler.setFormatter(  # type: ignore
         Formatter(
-            fmt="[%(asctime)s] %(threadName)s - %(message)s", datefmt="%Y/%m/%d-%H:%M:%S",
+            fmt="[%(asctime)s] %(threadName)s - %(message)s",
+            datefmt="%Y/%m/%d-%H:%M:%S",
         ),
     )
     logger = getLogger()
     logger.setLevel(INFO)
-    logger.addHandler(handler)
+    logger.addHandler(handler)  # type: ignore
 
 
-def allow_downloads(allow_time_min: int, RIR_URLs: list) -> bool:
+def allow_downloads(allow_time_min: int, RIR_URLs: list[str]) -> bool:
     # Determine whether to continue based on the time(min)
     # the file was downloaded
     current_time = datetime.now(tz=timezone.utc).timestamp()
@@ -79,7 +80,7 @@ def download(rir_url: str) -> bool:
     return True
 
 
-def parallel_download(RIR_URLs: list) -> bool:
+def parallel_download(RIR_URLs: list[str]) -> bool:
     getLogger().info("download task start")
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(download, rir_url) for rir_url in RIR_URLs]
@@ -96,7 +97,7 @@ def parallel_download(RIR_URLs: list) -> bool:
     return True
 
 
-def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
+def rir2cidr(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> None:
     """RIR Format.
 
         http://www.apnic.net/db/rir-stats-format.html
@@ -113,8 +114,8 @@ def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
         https://www.asahi-net.or.jp/~ax2s-kmtn/ref/iso3166-1.html
     """
     getLogger().info("RIR to CIDR start")
-    rir_ipv4_list = list
-    rir_ipv6_list = list
+    rir_ipv4_list: list[str] = []
+    rir_ipv6_list: list[str] = []
     rir_ipv4_list, rir_ipv6_list = extracts_ipv46_lists(RIR_URLs, EXCLUDED_COUNTRIES)
     getLogger().info("converted to CIDR start")
     cores = os.cpu_count()
@@ -129,11 +130,12 @@ def rir2cidr(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> None:
 
 
 def extracts_ipv46_lists(
-    RIR_URLs: list, EXCLUDED_COUNTRIES: list,
+    RIR_URLs: list[str],
+    EXCLUDED_COUNTRIES: list[str],
 ) -> tuple[list[str], list[str]]:
     getLogger().info("ipv4/ipv6 separate start")
-    rir_ipv4_list = []
-    rir_ipv6_list = []
+    rir_ipv4_list: list[str] = []
+    rir_ipv6_list: list[str] = []
     rir_ipv4_list_append = rir_ipv4_list.append
     rir_ipv6_list_append = rir_ipv6_list.append
     for rir_url in RIR_URLs:
@@ -162,14 +164,14 @@ def extracts_ipv46_lists(
     return rir_ipv4_list, rir_ipv6_list
 
 
-def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
+def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
     getLogger().info("ipv4 converted to CIDR start")
     getLogger().info("  ipv4 RIR to CIDR start")
     path_ipv4 = Path(Path.cwd()) / "ipv4"
     if not Path(path_ipv4).exists():
         Path(path_ipv4).mkdir()
     rir_cc = ""
-    cidr_ipv4_list = []
+    cidr_ipv4_list: list[str] = []
     cidr_ipv4_list_extend = cidr_ipv4_list.extend
     for line in rir_ipv4_list:
         params = line.split("|")
@@ -189,7 +191,8 @@ def rir2cidr_ipv4(rir_ipv4_list: list) -> None:
         width = int(params[3])
         from_ip = IPAddress(params[2], version=4)
         to_ip = IPAddress(int(from_ip) + width - 1)
-        cidr_ipv4_list_extend(IPRange(params[2], to_ip).cidrs())
+        # cidr_ipv4_list_extend(IPRange(params[2], to_ip).cidrs())
+        cidr_ipv4_list_extend(str(cidr) for cidr in IPRange(params[2], to_ip).cidrs())
         if line == rir_ipv4_list[-1]:
             write_cidr(rir_cc)
     getLogger().info("  ipv4 RIR to CIDR end")
@@ -212,18 +215,18 @@ def concatenate_ipv4_country_files() -> None:
                         outfile.write(country + "\t" + line)
 
 
-def rir2cidr_ipv6(rir_ipv6_list: list) -> None:
+def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
     getLogger().info("ipv6 converted to CIDR start")
     getLogger().info("  ipv6 RIR to CIDR start")
     path_ipv6 = os.path.abspath(os.path.join(os.getcwd(), "ipv6"))
     if not os.path.exists(path_ipv6):
         os.makedirs(path_ipv6)
     rir_cc = ""
-    cidr_ipv6_list = []
+    cidr_ipv6_list: list[str] = []
     cidr_ipv6_list_append = cidr_ipv6_list.append
     for line in rir_ipv6_list:
 
-        def write_cidr() -> None:
+        def write_cidr(rir_cc: str) -> None:
             ipv6_cidr_path = os.path.abspath(os.path.join(path_ipv6, rir_cc))
             cidr_ipv6_list.sort()
             ipv6set = IPSet(cidr_ipv6_list)
@@ -233,12 +236,12 @@ def rir2cidr_ipv6(rir_ipv6_list: list) -> None:
 
         params = line.split("|")
         if rir_cc != params[0] and line != rir_ipv6_list[0]:
-            write_cidr()
+            write_cidr(rir_cc)
             cidr_ipv6_list.clear()
         rir_cc = params[0]
         cidr_ipv6_list_append(params[2] + "/" + params[3])
         if line == rir_ipv6_list[-1]:
-            write_cidr()
+            write_cidr(rir_cc)
     getLogger().info("  ipv6 RIR to CIDR end")
     getLogger().info("  combine ipv6 country files start")
     concatenate_ipv6_country_files()
