@@ -191,7 +191,6 @@ def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
         width = int(params[3])
         from_ip = IPAddress(params[2], version=4)
         to_ip = IPAddress(int(from_ip) + width - 1)
-        # cidr_ipv4_list_extend(IPRange(params[2], to_ip).cidrs())
         cidr_ipv4_list_extend(str(cidr) for cidr in IPRange(params[2], to_ip).cidrs())
         if line == rir_ipv4_list[-1]:
             write_cidr(rir_cc)
