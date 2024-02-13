@@ -10,20 +10,23 @@
 import os
 import sys
 import time
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger
 from urllib.parse import urlparse
 
 import tqdm
 
 
-def init_logger() -> None:
-    # https://qiita.com/tag1216/items/db5adcf1ddcb67cfefc8
-    handler = StreamHandler()
-    handler.setLevel(INFO)
-    handler.setFormatter(Formatter("[%(asctime)s] [%(threadName)s] %(message)s"))
+def setup_logger(log_file: str = "") -> None:
+    handler = StreamHandler() if log_file == "" else FileHandler(log_file)
+    handler.setFormatter(  # type: ignore
+        Formatter(
+            fmt="[%(asctime)s] %(threadName)s - %(message)s",
+            datefmt="%Y/%m/%d-%H:%M:%S",
+        ),
+    )
     logger = getLogger()
-    logger.addHandler(handler)
     logger.setLevel(INFO)
+    logger.addHandler(handler)  # type: ignore
 
 
 def change_rir_format(line: str) -> str:
@@ -134,7 +137,7 @@ if __name__ == "__main__":
     DIR_IP_LISTS = "/var/ip-lists/"
     DIR_IP_LISTS = os.path.abspath(DIR_IP_LISTS)
 
-    init_logger()
+    setup_logger()
 
     print("Extract duplicate listings from RIR data")
     print("")
