@@ -32,6 +32,8 @@ allow-direct-references = true
 packages = ["src/mkcidr"]
 
 
+
+# The same case as the default setting is also declared.
 [tool.ruff]
 # https://docs.astral.sh/ruff/
 # https://docs.astral.sh/ruff/settings/
@@ -39,7 +41,6 @@ packages = ["src/mkcidr"]
 target-version = "py310"
 line-length = 110
 indent-width = 4
-exclude = [".git", ".venv", ".mypy_cache", "__pycache__"]
 
 [tool.ruff.format]
 quote-style = "double"
