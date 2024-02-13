@@ -2,11 +2,6 @@
 
 # Extract data for the same IP address from the RIR list
 
-# The library "concurrent.futures" is available in Python version 3.2 or later
-# and has been tested with Python 3.10.
-# https://docs.python.org/ja/3/library/concurrent.futures.html
-
-
 import os
 import sys
 import time
