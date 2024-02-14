@@ -15,13 +15,12 @@ trim_trailing_whitespace = false
 
 [*.{bat,cmd}]
 end_of_line = crlf
-indent_size = 4
 
 [Makefile]
 indent_style = tab
 
 [lib/**.js]
-indent_size = 4
+indent_size = 2
 
 [{package.json,.travis.yml}]
-indent_size = 4
+indent_size = 2
