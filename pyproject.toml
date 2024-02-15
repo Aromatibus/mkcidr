@@ -61,7 +61,7 @@ ignore = [
     "INP001", # implicit-namespace-package : 暗黙的な名前空間パッケージを使用しています
     "T20", # print found : print文があります ※loggingとは異なり誤って機密情報が含まれる可能性があります
     "S311", # suspicious-non-cryptographic-random-usage : 暗号学的でない乱数生成を使用しています
-    "PTH", # Use of the `pathlib` module is preferred over `os.path` : `os.path`よりも`pathlib`モジュールの使用が推奨されています
+    #  "PTH", # Use of the `pathlib` module is preferred over `os.path` : `os.path`よりも`pathlib`モジュールの使用が推奨されています
     #  "ERA001", # Found commented-out code : コメントアウトされたコードがあります
     "PGH003", # Use specific rule codes when ignoring type issues : 型の問題を無視する際に具体的なルールコードを使用します
     "PGH004", # Use specific rule codes when using noqa : noqaを使用する際に具体的なルールコードを使用します
@@ -80,7 +80,7 @@ max-bool-expr = 5       # 1つのif文で使用できるブール式の最大数
 max-branches = 12       # 関数またはメソッド本体に許される分岐の最大数 (PLR0912) default: 12
 max-locals = 15         # 関数またはメソッド本体で使用できるローカル変数の最大数 (PLR0914) default: 15
 max-nested-blocks = 5   # 関数またはメソッド本体内で許可される入れ子ブロックの最大数 (PLR1702) default: 5
-#  max-pos-args = 3     # 関数またはメソッドの定義で使用できる位置引数の最大数 (PLR0917) default: 3
+#  max-pos-args = 3        # 関数またはメソッドの定義で使用できる位置引数の最大数 (PLR0917) default: 3
 max-public-methods = 20 # クラスに許されるパブリックメソッドの最大数 (PLR0904) default: 20
 max-returns = 6         # 関数またはメソッド本体に許される return 文の最大数 (PLR0911) default: 6
 max-statements = 50     # 関数またはメソッド本体に許されるステートメントの最大数 (PLR0915) default: 50

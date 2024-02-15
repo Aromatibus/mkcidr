@@ -172,17 +172,17 @@ def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
     rir_cc = ""
     cidr_ipv4_list: list[str] = []
     cidr_ipv4_list_extend = cidr_ipv4_list.extend
+
+    def write_cidr(rir_cc: str) -> None:
+        ipv4_cidr_path = Path(path_ipv4) / rir_cc
+        cidr_ipv4_list.sort()
+        ipv4set = IPSet(cidr_ipv4_list)
+        with Path(ipv4_cidr_path).open(mode="w", encoding="utf-8", newline="\n") as file:
+            for cidr in ipv4set.iter_cidrs():
+                file.write(str(cidr) + "\n")
+
     for line in rir_ipv4_list:
         params = line.split("|")
-
-        def write_cidr(rir_cc: str) -> None:
-            ipv4_cidr_path = Path(path_ipv4) / rir_cc
-            cidr_ipv4_list.sort()
-            ipv4set = IPSet(cidr_ipv4_list)
-            with Path(ipv4_cidr_path).open(mode="w", encoding="utf-8", newline="\n") as file:
-                for cidr in ipv4set.iter_cidrs():
-                    file.write(str(cidr) + "\n")
-
         if rir_cc != params[0] and line != rir_ipv4_list[0]:
             write_cidr(rir_cc)
             cidr_ipv4_list.clear()
@@ -254,7 +254,7 @@ def concatenate_ipv6_country_files() -> None:
     with Path(path_ipv6 / "_CIDR.ipv6").open("w", encoding="utf-8", newline="\n") as outfile:
         for filename in file_list:
             country = Path(filename).name.split(".")[0]
-            with open(filename) as infile:
+            with Path(filename).open("r") as infile:
                 for line in infile:
                     if line.strip() != "":
                         outfile.write(country + "\t" + line)
@@ -309,9 +309,3 @@ if __name__ == "__main__":
     getLogger().info("")
 
     sys.exit(0)
-
-    start = time.time()
-    rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
-    getLogger().info(f"processing time : {time.time() - start:,.2f} sec")
-
-    sys.exit(1)

@@ -6,6 +6,7 @@ import os
 import sys
 import time
 from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger
+from pathlib import Path
 from urllib.parse import urlparse
 
 import tqdm
@@ -48,16 +49,16 @@ def restore_rir_format(line: str) -> str:
     return "|".join(params[0:8])
 
 
-def rir_load_reformat_ipv4(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> list:
+def rir_load_reformat_ipv4(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> list[str]:
     getLogger().info("RIR Same Checker ipv4 : start")
-    check_list = []
+    check_list: list[str] = []
     check_list_append = check_list.append
     getLogger().info("RIR Same Checker ipv4 : Load RIR")
     for rir_url in RIR_URLs:
-        rir_filename = os.path.basename(urlparse(rir_url).path)
+        rir_filename = Path(urlparse(rir_url).path).name
         rir_registry = rir_filename.split("-")[1]
-        rir_path = os.path.abspath(os.path.join(os.getcwd(), rir_filename))
-        with open(rir_path) as file:
+        rir_path = Path.cwd().resolve() / rir_filename
+        with rir_path.open() as file:
             for line in file:
                 if line.startswith("#"):
                     continue
@@ -75,12 +76,11 @@ def rir_load_reformat_ipv4(RIR_URLs: list, EXCLUDED_COUNTRIES: list) -> list:
     return check_list
 
 
-def rir_same_checker_ipv4(check_list: list) -> None:
+def rir_same_checker_ipv4(check_list: list[str]) -> None:
     getLogger().info("RIR Same Checker ipv4 : Same Check Start")
-    path_ipv4 = os.path.abspath(os.path.join(os.getcwd(), "ipv4"))
-    if not os.path.exists(path_ipv4):
-        os.makedirs(path_ipv4)
-    same_list = []
+    path_ipv4 = Path.cwd().resolve() / "ipv4"
+    path_ipv4.mkdir(parents=True, exist_ok=True)
+    same_list: list[str] = []
     same_list_append = same_list.append
     if str(check_list[0].split("|")[0]) == str(check_list[1].split("|")[0]):
         required_param = restore_rir_format(check_list[0])
@@ -101,9 +101,8 @@ def rir_same_checker_ipv4(check_list: list) -> None:
             same_list_append(required_param)
             continue
     getLogger().info("RIR Same Checker ipv4 : Write File")
-    with open(
-        path_ipv4 + "/_Same_RIR.ipv4",
-        "w",
+    with (path_ipv4 / "_Same_RIR.ipv4").open(
+        mode="w",
         encoding="utf-8",
         newline="\n",
     ) as outfile:
@@ -130,15 +129,15 @@ if __name__ == "__main__":
     EXCLUDED_COUNTRIES = ["ZZ"]
 
     DIR_IP_LISTS = "/var/ip-lists/"
-    DIR_IP_LISTS = os.path.abspath(DIR_IP_LISTS)
+    DIR_IP_LISTS = Path(DIR_IP_LISTS).resolve()
 
     setup_logger()
 
     print("Extract duplicate listings from RIR data")
     print("")
 
-    if not os.path.exists(DIR_IP_LISTS):
-        os.makedirs(DIR_IP_LISTS)
+    if not DIR_IP_LISTS.exists():
+        DIR_IP_LISTS.mkdir(parents=True)
 
     if not os.access(DIR_IP_LISTS, os.W_OK):
         print("You do not have write permission to the /var/ directory.")
