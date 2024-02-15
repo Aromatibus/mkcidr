@@ -58,7 +58,7 @@ def rir_load_reformat_ipv4(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -
         rir_filename = Path(urlparse(rir_url).path).name
         rir_registry = rir_filename.split("-")[1]
         rir_path = Path.cwd().resolve() / rir_filename
-        with rir_path.open() as file:
+        with Path(rir_path).open() as file:
             for line in file:
                 if line.startswith("#"):
                     continue
@@ -101,7 +101,7 @@ def rir_same_checker_ipv4(check_list: list[str]) -> None:
             same_list_append(required_param)
             continue
     getLogger().info("RIR Same Checker ipv4 : Write File")
-    with (path_ipv4 / "_Same_RIR.ipv4").open(
+    with Path(path_ipv4 / "_Same_RIR.ipv4").open(
         mode="w",
         encoding="utf-8",
         newline="\n",
