@@ -141,7 +141,7 @@ def extracts_ipv46_lists(
         rir_filename = Path(urlparse(rir_url).path).name
         rir_registry = rir_filename.split("-")[1]
         rir_path = Path(Path.cwd()) / rir_filename
-        with Path(rir_path).open(mode="r") as file:
+        with rir_path.open(mode="r") as file:
             for line in file:
                 if line.startswith("#"):
                     continue
@@ -166,25 +166,25 @@ def extracts_ipv46_lists(
 def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
     getLogger().info("ipv4 converted to CIDR start")
     getLogger().info("  ipv4 RIR to CIDR start")
-    path_ipv4 = Path(Path.cwd()) / "ipv4"
-    if not Path(path_ipv4).exists():
-        Path(path_ipv4).mkdir()
+    path_ipv4 = Path.cwd() / "ipv4"
+    if not path_ipv4.exists():
+        path_ipv4.mkdir()
     rir_cc = ""
     cidr_ipv4_list: list[str] = []
     cidr_ipv4_list_extend = cidr_ipv4_list.extend
 
-    def write_cidr(rir_cc: str) -> None:
+    def write_cidr(path_ipv4: Path, rir_cc: str) -> None:
         ipv4_cidr_path = Path(path_ipv4) / rir_cc
         cidr_ipv4_list.sort()
         ipv4set = IPSet(cidr_ipv4_list)
-        with Path(ipv4_cidr_path).open(mode="w", encoding="utf-8", newline="\n") as file:
+        with ipv4_cidr_path.open(mode="w", encoding="utf-8", newline="\n") as file:
             for cidr in ipv4set.iter_cidrs():
                 file.write(str(cidr) + "\n")
 
     for line in rir_ipv4_list:
         params = line.split("|")
         if rir_cc != params[0] and line != rir_ipv4_list[0]:
-            write_cidr(rir_cc)
+            write_cidr(path_ipv4, rir_cc)
             cidr_ipv4_list.clear()
         rir_cc = params[0]
         width = int(params[3])
@@ -192,7 +192,7 @@ def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
         to_ip = IPAddress(int(from_ip) + width - 1)
         cidr_ipv4_list_extend(str(cidr) for cidr in IPRange(params[2], to_ip).cidrs())
         if line == rir_ipv4_list[-1]:
-            write_cidr(rir_cc)
+            write_cidr(path_ipv4, rir_cc)
     getLogger().info("  ipv4 RIR to CIDR end")
     getLogger().info("  combine ipv4 country files start")
     concatenate_ipv4_country_files()
@@ -201,7 +201,7 @@ def rir2cidr_ipv4(rir_ipv4_list: list[str]) -> None:
 
 
 def concatenate_ipv4_country_files() -> None:
-    path_ipv4 = Path(Path.cwd()) / "ipv4"
+    path_ipv4 = Path.cwd() / "ipv4"
     file_list = list(Path(path_ipv4).glob("[A-Z][A-Z]"))
     file_list.sort()
     with Path(path_ipv4 / "_CIDR.ipv4").open(mode="w", encoding="utf-8", newline="\n") as outfile:
@@ -223,23 +223,23 @@ def rir2cidr_ipv6(rir_ipv6_list: list[str]) -> None:
     cidr_ipv6_list: list[str] = []
     cidr_ipv6_list_append = cidr_ipv6_list.append
 
-    def write_cidr(path_ipv6: str, rir_cc: str) -> None:
-        ipv6_cidr_path = Path(path_ipv6).resolve() / rir_cc
+    def write_cidr(path_ipv6: Path, rir_cc: str) -> None:
+        ipv6_cidr_path = path_ipv6.resolve() / rir_cc
         cidr_ipv6_list.sort()
         ipv6set = IPSet(cidr_ipv6_list)
-        with Path(ipv6_cidr_path).open("w") as file:
+        with ipv6_cidr_path.open("w") as file:
             for cidr in ipv6set.iter_cidrs():
                 file.write(str(cidr) + "\n")
 
     for line in rir_ipv6_list:
         params = line.split("|")
         if rir_cc != params[0] and line != rir_ipv6_list[0]:
-            write_cidr(str(path_ipv6), rir_cc)
+            write_cidr(path_ipv6, rir_cc)
             cidr_ipv6_list.clear()
         rir_cc = params[0]
         cidr_ipv6_list_append(params[2] + "/" + params[3])
         if line == rir_ipv6_list[-1]:
-            write_cidr(str(path_ipv6), rir_cc)
+            write_cidr(path_ipv6, rir_cc)
     getLogger().info("  ipv6 RIR to CIDR end")
     getLogger().info("  combine ipv6 country files start")
     concatenate_ipv6_country_files()
@@ -276,21 +276,21 @@ if __name__ == "__main__":
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
 
-    DIR_IP_LISTS = "/var/ip-lists/"
-    DIR_IP_LISTS = Path(DIR_IP_LISTS).resolve()
+    Path_IP_LISTS = Path("/var/ip-lists/").resolve()
 
     setup_logger()
 
     getLogger().info("RIR to CIDR IP lists start")
     getLogger().info("")
 
-    if not Path(DIR_IP_LISTS).exists():
-        Path(DIR_IP_LISTS).mkdir(parents=True)
-    if not os.access(DIR_IP_LISTS, os.W_OK):
+    # Debug /var ????
+    if not os.access(Path_IP_LISTS, os.W_OK):
         getLogger().info("You do not have write permission to the /var/ directory.")
         getLogger().info("")
         sys.exit(1)
-    os.chdir(DIR_IP_LISTS)
+    if not Path_IP_LISTS.exists():
+        Path_IP_LISTS.mkdir(mode=0o755, parents=False, exist_ok=True)
+    os.chdir(Path_IP_LISTS)
 
     start = time.time()
     allow_time_min = 18 * 60  # 18 hours
