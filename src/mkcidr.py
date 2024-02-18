@@ -283,14 +283,12 @@ if __name__ == "__main__":
     getLogger().info("RIR to CIDR IP lists start")
     getLogger().info("")
 
-    # Debug permission check and default directory settings
-    # https://docs.python.org/ja/3.10/library/pathlib.html#methods-and-properties
-    if not os.access(Path_IP_LISTS, os.W_OK):
-        getLogger().info("You do not have write permission to the /var/ directory.")
+    if not os.access(Path_IP_LISTS.parents[0], os.W_OK):
+        getLogger().info(f"You do not have write permission to the '{Path_IP_LISTS.parents[0]}' directory.")
         getLogger().info("")
         sys.exit(1)
     if not Path_IP_LISTS.exists():
-        Path_IP_LISTS.mkdir(mode=0o755, parents=False, exist_ok=True)
+        Path_IP_LISTS.mkdir(mode=0o664, parents=False, exist_ok=True)
     os.chdir(Path_IP_LISTS)
 
     start = time.time()
