@@ -23,7 +23,7 @@ end_of_line = crlf
 indent_style = tab
 
 [*.{htm,html}]
-indent_style = tab
+indent_size = 2
 
 [lib/**.js]
 indent_size = 2
