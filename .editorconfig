@@ -1,5 +1,6 @@
 # EditorConfig is awesome: https://EditorConfig.org
-root = true
+
+root = true # 上位の階層にある.editorconfigを探索しない
 
 [*]
 max_line_length = 120 # int(ex:80, 120), 0(無効), 競合に注意
