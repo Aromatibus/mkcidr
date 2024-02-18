@@ -2,6 +2,7 @@
 root = true
 
 [*]
+max_line_length = 120 # int(ex:80, 120), 0(無効), 競合に注意
 charset = utf-8  # latin1, utf-8, utf-8-bom, utf-16be utf-16le
 indent_style = space  # space, tab
 indent_size = 4 # int(ex:2, 4), tab
@@ -11,12 +12,16 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 [*.md]
+max_line_length = 0
 trim_trailing_whitespace = false
 
 [*.{bat,cmd}]
 end_of_line = crlf
 
 [Makefile]
+indent_style = tab
+
+[*.{htm,html}]
 indent_style = tab
 
 [lib/**.js]
