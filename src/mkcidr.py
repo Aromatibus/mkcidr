@@ -285,6 +285,9 @@ if __name__ == "__main__":
 
     if not os.access(Path_IP_LISTS.parents[0], os.W_OK):
         getLogger().info(f"You do not have write permission to the '{Path_IP_LISTS.parents[0]}' directory.")
+
+        getLogger().info(f"Directory '{Path_IP_LISTS.parents[0]}' No write permissions.")
+
         sys.exit(1)
     if not Path_IP_LISTS.exists():
         Path_IP_LISTS.mkdir(mode=0o664, parents=False, exist_ok=True)
