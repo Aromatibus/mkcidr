@@ -293,7 +293,8 @@ if __name__ == "__main__":
     getLogger().info("")
 
     start = time.time()
-    allow_time_min = 18 * 60  # 18 hours
+    HOUR = 60
+    allow_time_min = 18 * HOUR
     if allow_downloads(allow_time_min, RIR_URLs):
         if not parallel_download(RIR_URLs):
             getLogger().info("The download was canceled because an error occurred.")
