@@ -284,8 +284,6 @@ if __name__ == "__main__":
     getLogger().info("")
 
     if not os.access(Path_IP_LISTS.parents[0], os.W_OK):
-        getLogger().info(f"You do not have write permission to the '{Path_IP_LISTS.parents[0]}' directory.")
-
         getLogger().info(f"Directory '{Path_IP_LISTS.parents[0]}' No write permissions.")
 
         sys.exit(1)
