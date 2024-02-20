@@ -32,14 +32,12 @@ allow-direct-references = true
 packages = ["src/mkcidr"]
 
 
-
-# The same case as the default setting is also declared.
 [tool.ruff]
 # https://docs.astral.sh/ruff/
 # https://docs.astral.sh/ruff/settings/
 # https://docs.astral.sh/ruff/configuration/
 target-version = "py310"
-line-length = 110
+line-length = 110 # 編集画面に表示できる1行の文字数
 indent-width = 4
 
 [tool.ruff.format]
@@ -80,7 +78,7 @@ max-bool-expr = 5       # 1つのif文で使用できるブール式の最大数
 max-branches = 12       # 関数またはメソッド本体に許される分岐の最大数 (PLR0912) default: 12
 max-locals = 15         # 関数またはメソッド本体で使用できるローカル変数の最大数 (PLR0914) default: 15
 max-nested-blocks = 5   # 関数またはメソッド本体内で許可される入れ子ブロックの最大数 (PLR1702) default: 5
-#  max-pos-args = 3        # 関数またはメソッドの定義で使用できる位置引数の最大数 (PLR0917) default: 3
+#  max-pos-args = 3     # 関数またはメソッドの定義で使用できる位置引数の最大数 (PLR0917) default: 3
 max-public-methods = 20 # クラスに許されるパブリックメソッドの最大数 (PLR0904) default: 20
 max-returns = 6         # 関数またはメソッド本体に許される return 文の最大数 (PLR0911) default: 6
 max-statements = 50     # 関数またはメソッド本体に許されるステートメントの最大数 (PLR0915) default: 50
