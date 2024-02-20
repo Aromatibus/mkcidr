@@ -3,7 +3,7 @@
 root = true # 上位の階層にある.editorconfigを探索しない
 
 [*]
-max_line_length = 120 # int(ex:80, 120), 0(無効), 競合に注意
+max_line_length = 80 # int(ex:80, 120), 0(無効), 競合に注意
 charset = utf-8  # latin1, utf-8, utf-8-bom, utf-16be utf-16le
 indent_style = space  # space, tab
 indent_size = 4 # int(ex:2, 4), tab
