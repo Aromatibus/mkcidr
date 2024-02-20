@@ -37,7 +37,7 @@ packages = ["src/mkcidr"]
 # https://docs.astral.sh/ruff/settings/
 # https://docs.astral.sh/ruff/configuration/
 target-version = "py310"
-line-length = 110 # 編集画面に表示できる1行の文字数
+line-length = 110 # 編集画面に表示できる1行の半角文字数
 indent-width = 4
 
 [tool.ruff.format]
