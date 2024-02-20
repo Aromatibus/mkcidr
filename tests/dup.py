@@ -15,3 +15,20 @@ print()
 print("Duplicated:")
 print(data_frame.duplicated())
 print()
+
+print("Duplicated: name")
+print(data_frame.duplicated(subset="state"))
+print()
+
+
+print("Duplicated: state")
+print(data_frame.duplicated(subset="name"))
+print()
+
+print("Duplicated: name, state")
+print(data_frame.duplicated(subset=["name", "state"]))
+print()
+
+print("Duplicated Data: name, state ")
+print(data_frame[data_frame.duplicated(subset=["name", "state"])])
+print()
