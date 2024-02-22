@@ -9,17 +9,31 @@
 
 -e file:.
 certifi==2024.2.2
+    # via requests
 charset-normalizer==3.3.2
-colorama==0.4.6
+    # via requests
 idna==3.6
+    # via requests
 netaddr==0.10.1
+    # via mkcidr
 numpy==1.26.4
+    # via pandas
 pandas==2.2.0
+    # via mkcidr
 python-dateutil==2.8.2
+    # via pandas
 pytz==2024.1
+    # via pandas
 requests==2.31.0
+    # via mkcidr
 six==1.16.0
+    # via python-dateutil
 tqdm==4.66.1
+    # via mkcidr
 types-requests==2.31.0.20240125
+    # via mkcidr
 tzdata==2024.1
+    # via pandas
 urllib3==2.2.0
+    # via requests
+    # via types-requests
