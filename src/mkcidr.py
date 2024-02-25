@@ -308,6 +308,6 @@ if __name__ == "__main__":
         getLogger().info(
             "The download was canceled because the specified time has not elapsed.",
         )
-    getLogger().info("")
+    getLogger().info("end")
 
     sys.exit(0)
