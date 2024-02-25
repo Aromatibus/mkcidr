@@ -276,7 +276,7 @@ if __name__ == "__main__":
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
 
-    Path_IP_LISTS = Path("/var/ip-lists/").resolve()
+    Path_IP_LISTS = Path(__file__).parent / "ip-lists"
 
     setup_logger()
 
@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
         sys.exit(1)
     if not Path_IP_LISTS.exists():
-        Path_IP_LISTS.mkdir(mode=0o664, parents=False, exist_ok=True)
+        Path_IP_LISTS.mkdir(mode=0o775, parents=False, exist_ok=True)
     os.chdir(Path_IP_LISTS)
     getLogger().info(f"Destination Directories '{Path_IP_LISTS}'")
     getLogger().info("")

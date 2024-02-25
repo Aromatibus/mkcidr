@@ -128,23 +128,22 @@ if __name__ == "__main__":
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
 
-    DIR_IP_LISTS = "/var/ip-lists/"
-    DIR_IP_LISTS = Path(DIR_IP_LISTS).resolve()
+    Path_IP_LISTS = Path(__file__).parent / "ip-lists"
 
     setup_logger()
 
     print("Extract duplicate listings from RIR data")
     print("")
 
-    if not DIR_IP_LISTS.exists():
-        DIR_IP_LISTS.mkdir(parents=True)
+    if not Path_IP_LISTS.exists():
+        Path_IP_LISTS.mkdir(parents=True)
 
-    if not os.access(DIR_IP_LISTS, os.W_OK):
+    if not os.access(Path_IP_LISTS, os.W_OK):
         print("You do not have write permission to the /var/ directory.")
         print("")
         sys.exit(1)
 
-    os.chdir(DIR_IP_LISTS)
+    os.chdir(Path_IP_LISTS)
 
     start = time.time()
     rir_same_checker_ipv4(rir_load_reformat_ipv4(RIR_URLs, EXCLUDED_COUNTRIES))
