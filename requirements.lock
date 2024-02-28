@@ -18,7 +18,7 @@ netaddr==0.10.1
     # via mkcidr
 numpy==1.26.4
     # via pandas
-pandas==2.2.0
+pandas==2.2.1
     # via mkcidr
 python-dateutil==2.8.2
     # via pandas

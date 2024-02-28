@@ -9,6 +9,7 @@ from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger
 from pathlib import Path
 from urllib.parse import urlparse
 
+import pandas as pd
 import tqdm
 
 

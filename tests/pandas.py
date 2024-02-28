@@ -4,9 +4,10 @@ from pathlib import Path
 
 import pandas as pd
 
-Path_CSV = Path("./testdata").resolve()
+Path_CSV = Path(__file__).parent / "testdata"
+print(f"Path:{Path_CSV}")
 
-data_frame = pd.read_csv(Path_CSV)
+data_frame = pd.read_csv(str(Path_CSV))
 
 print("Original:")
 print(data_frame)
