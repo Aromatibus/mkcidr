@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pandas as pd
 
-Path_CSV = Path(__file__).parent / "testdata"
+Path_CSV = Path(__file__).parent / "testdata.csv"
 print(f"Path:{Path_CSV}")
 
-data_frame = pd.read_csv(str(Path_CSV))
+data_frame = pd.read_csv(Path_CSV, delimiter=",", header=None, names=["name", "age", "state", "point"])
 
 print("Original:")
 print(data_frame)
