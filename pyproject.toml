@@ -87,34 +87,3 @@ max-statements = 50     # 関数またはメソッド本体に許されるステ
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["E402"] # Ignore `E402` (import violations) : importエラーを無視します
 "**/{tests,docs,tools}/*" = ["E402"] # Ignore `E402` (import violations) : importエラーを無視します
-
-
-[tool.mypy]
-# https://mypy.readthedocs.io/en/stable/index.html
-python_version = "3.10"
-show_traceback = "True"              # mypyがクラッシュした場合にトレースバックを表示します
-error_summary = "True"               # エラーメッセージの概要を表示します
-pretty = "True"                      # エラーメッセージを見やすくフォーマットします
-color_output = "True"                # エラーメッセージに色を付けて表示します
-show_column_numbers = "True"         # エラーの発生した列番号を表示します
-show_error_codes = "True"            # エラーコードを表示します
-show_error_context = "True"          # エラーメッセージのコンテキストを表示します
-allow_redefinition = "True"          # 同じスコープ内での変数の再定義を禁止します
-allow_untyped_globals = "True"       # 型注釈がないグローバル変数の使用を禁止します
-check_untyped_defs = "True"          # 型注釈がない関数やメソッドに対して型チェックを実施します
-disallow_incomplete_defs = "True"    # 型注釈の一部が欠けている関数やメソッドの定義を禁止します
-disallow_untyped_defs = "True"       # 型注釈がない関数やメソッドの定義を禁止します
-disallow_untyped_calls = "True"      # 型注釈がない関数やメソッドの呼び出しを禁止します
-disallow_untyped_decorators = "True" # 型注釈がないデコレータの使用を禁止します
-ignore_missing_imports = "True"      # 型情報がないモジュールのインポートを無視します
-implicit_reexport = "False"          # 型注釈がない関数やメソッドの再エクスポートを禁止します
-no_implicit_optional = "True"        # Optionalの型を明示的に宣言を強制します
-strict = "True"                      # すべてのstrictモード関連のオプションを有効にします
-strict_equality = "True"             # 異なる型同士の等価性の比較を禁止します
-strict_optional = "True"             # Noneと他の型の混在を許容しません
-warn_no_return = "True"              # 戻り値がない関数やメソッドでのreturn文の省略に警告します
-warn_redundant_casts = "True"        # 不要な型変換に警告します
-warn_return_any = "True"             # `Any`型を返す関数やメソッドに警告します
-warn_unreachable = "True"            # 到達不能なコードに警告します
-warn_unused_configs = "True"         # 使用されていないconfigオプションに警告します
-warn_unused_ignores = "True"         # 使用されていない`# type: ignore`コメントに警告します
