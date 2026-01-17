@@ -23,7 +23,7 @@ from urllib3.util import Retry
 
 def setup_logger(log_file: str = "") -> None:
     handler = StreamHandler() if log_file == "" else FileHandler(log_file)
-    handler.setFormatter(  # type: ignore
+    handler.setFormatter(
         Formatter(
             fmt="[%(asctime)s] %(threadName)s - %(message)s",
             datefmt="%Y/%m/%d-%H:%M:%S",
@@ -31,7 +31,7 @@ def setup_logger(log_file: str = "") -> None:
     )
     logger = getLogger()
     logger.setLevel(INFO)
-    logger.addHandler(handler)  # type: ignore
+    logger.addHandler(handler)
 
 
 def allow_downloads(allow_time_min: int, RIR_URLs: list[str]) -> bool:
@@ -65,7 +65,7 @@ def download(rir_url: str) -> bool:
         session.close()
         response.raise_for_status()
     except Exception as e:
-        getLogger().error("  download error : %s", rir_registry + " (" + str(e) + ")")
+        getLogger().exception("  download error : %s", rir_registry + " (" + str(e) + ")")  # noqa: TRY401
         return False
     else:
         http_success = 200
@@ -284,13 +284,13 @@ if __name__ == "__main__":
     getLogger().info("")
 
     if not os.access(Path_IP_LISTS.parents[0], os.W_OK):
-        getLogger().info(f"Directory '{Path_IP_LISTS.parents[0]}' No write permissions.")
+        getLogger().info("Directory '%s' No write permissions.", Path_IP_LISTS.parents[0])
 
         sys.exit(1)
     if not Path_IP_LISTS.exists():
         Path_IP_LISTS.mkdir(mode=0o775, parents=False, exist_ok=True)
     os.chdir(Path_IP_LISTS)
-    getLogger().info(f"Destination Directories '{Path_IP_LISTS}'")
+    getLogger().info("Destination Directories '%s'", Path_IP_LISTS)
     getLogger().info("")
 
     start = time.time()
@@ -300,10 +300,10 @@ if __name__ == "__main__":
         if not parallel_download(RIR_URLs):
             getLogger().info("The download was canceled because an error occurred.")
             sys.exit(1)
-        getLogger().info(f"download time : {time.time() - start:,.2f} sec")
+        getLogger().info("download time : %.2f sec", time.time() - start)
         start = time.time()
         rir2cidr(RIR_URLs, EXCLUDED_COUNTRIES)
-        getLogger().info(f"processing time : {time.time() - start:,.2f} sec")
+        getLogger().info("processing time : %.2f sec", time.time() - start)
     else:
         getLogger().info(
             "The download was canceled because the specified time has not elapsed.",

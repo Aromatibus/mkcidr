@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
 
 # Extract data for the same IP address from the RIR list
 
@@ -14,7 +14,7 @@ import tqdm
 
 def setup_logger(log_file: str = "") -> None:
     handler = StreamHandler() if log_file == "" else FileHandler(log_file)
-    handler.setFormatter(  # type: ignore
+    handler.setFormatter(
         Formatter(
             fmt="[%(asctime)s] %(threadName)s - %(message)s",
             datefmt="%Y/%m/%d-%H:%M:%S",
@@ -22,7 +22,7 @@ def setup_logger(log_file: str = "") -> None:
     )
     logger = getLogger()
     logger.setLevel(INFO)
-    logger.addHandler(handler)  # type: ignore
+    logger.addHandler(handler)
 
 
 def change_rir_format(line: str) -> str:
@@ -133,15 +133,13 @@ if __name__ == "__main__":
 
     setup_logger()
 
-    print("Extract duplicate listings from RIR data")
-    print("")
+    print("Extract duplicate listings from RIR data\n")
 
     if not DIR_IP_LISTS.exists():
         DIR_IP_LISTS.mkdir(parents=True)
 
     if not os.access(DIR_IP_LISTS, os.W_OK):
-        print("You do not have write permission to the /var/ directory.")
-        print("")
+        print("You do not have write permission to the /var/ directory.\n")
         sys.exit(1)
 
     os.chdir(DIR_IP_LISTS)
