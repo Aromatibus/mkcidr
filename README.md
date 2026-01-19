@@ -4,7 +4,7 @@
 
 ※本編より並列ダウンロード処理の方が珍しいとのことで並列処理のタグを加筆しました。
 ※プログレスバーによる進捗表示（[rir-samechk.py][]）も実装しているのは見ないそうです。
-※AIでPythonからC#に変換したバージョンはCIDRの処理に誤りがあるためQiitaでの公開停止しました。
+※AIでPythonから変換したC#版はCIDRの処理に誤りがあるためQiitaでの公開停止しました。
 
 GitHubで公開しています。
 <!-- markdownlint-disable-next-line MD034 -->
