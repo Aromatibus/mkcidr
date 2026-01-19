@@ -65,8 +65,8 @@ if __name__ == "__main__":
     getLogger().info("")
     print(f"processing time : {time() - start:,.2f} sec")
 
-    print("")
-    print("")
+    print()
+    print()
     start = time()
     print("getLogger pattern 2. DEBUG")
     set_logger(level=DEBUG)
