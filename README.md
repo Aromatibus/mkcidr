@@ -107,7 +107,8 @@ NURO光を使ってるんですがWebページの作成など色々と試す前�
 そもそもNURO光は確保しているIP4アドレスが少ないらしく今後、公開サーバーの運用はほぼ絶望的みたいですね。
 乗り換えを考えていますが今後はMAP-Eが当たり前になってしまうんだろうか・・・
 
-<https://github.com/Aromatibus/>
+<!-- markdownlint-disable-next-line MD034 -->
+https://github.com/Aromatibus/
 
 [rir-samechk.py]: https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
 [D&Dでコンパイルするバッチファイル]: https://github.com/Aromatibus/mkcidr/blob/main/src/cs_ver/CSC_Http_CLI64_DragDropHere.bat
