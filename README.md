@@ -5,7 +5,7 @@
 ※本編より並列ダウンロード処理の方が珍しいとのことで並列処理のタグを加筆しました。
 ※プログレスバーによる進捗表示（[rir-samechk.py][]）も実装しているのは見ないそうです。
 
-GITHUBで公開しています。
+GitHubで公開しています。
 <!-- markdownlint-disable-next-line MD034 -->
 https://github.com/Aromatibus/mkcidr
 
@@ -26,6 +26,8 @@ https://github.com/Aromatibus/mkcidr
 とは言え、色々と楽しかったのですが（笑）
 
 ※準備中、[Server World][]様には大変お世話になりました。ありがとうございます！！
+<!-- markdownlint-disable-next-line MD034 -->
+https://www.server-world.info/
 
 ## ◇不正アクセスの多いこと多いこと
 
@@ -36,7 +38,7 @@ https://github.com/Aromatibus/mkcidr
 そこで不正アクセスを次の記事を参考にして遮断することにしました。
 
 - 不正アクセスを遮断
-  - [Server World][]様の記事から[Fail2Ban : 侵入防止システム][]
+  - [Fail2Ban : 侵入防止システム][]
   - [5分で理解するfail2ban][]
 - 国外からのアクセスを遮断
   - [Nginxで国外からのWEBアクセスを遮断][]
