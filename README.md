@@ -2,6 +2,9 @@
 
 ## ◇はじめに
 
+※本編よりも並列ダウンロード処理の方が珍しいとのことでこの一行を加筆しました。（笑）
+※プログレスバーによる進捗表示（[rir-samechk.py][]）も実装しているのは見ないそうです。
+
 GITHUBで公開しています。
 [Aromatibus/mkcidr]
 
@@ -753,3 +756,4 @@ NURO光を使ってるんですがWebページの作成など色々と試す前�
 [【Cent OS 6.x】国単位でIPをブロックするスクリプト with ipset]: https://qiita.com/R123/items/dc82461ad127c5ea0703
 [世界の国別 IPv4 アドレス割り当てリスト]: http://nami.jp/ipv4bycc/
 [Google Gemini]: https://gemini.google.com/
+[rir-samechk.py]: https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
