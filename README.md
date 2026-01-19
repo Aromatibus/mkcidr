@@ -1,8 +1,8 @@
-# ⧉国外からのサーバーアクセスを遮断するCIDRリストを自前で作成してみる
+# ⧉国外からのサーバーアクセスを遮断するCIDRリストを自前で作成してみる（並列処理も有り）
 
 ## ◇はじめに
 
-※本編よりも並列ダウンロード処理の方が珍しいとのことでこの一行を加筆しました。（笑）
+※本編よりも並列ダウンロード処理の方が珍しいとのことでこの一行を加筆しました。
 ※プログレスバーによる進捗表示（[rir-samechk.py][]）も実装しているのは見ないそうです。
 
 GITHUBで公開しています。
@@ -10,7 +10,7 @@ GITHUBで公開しています。
 https://github.com/Aromatibus/mkcidr
 
 :::note alert
-テストは行っていますが、十分な運用期間があるとは言えないため注意してください。
+テストは行っていますが無保証です。十分な運用期間があるとは言えないため注意してください。
 :::
 
 :::note warn
@@ -46,17 +46,23 @@ https://github.com/Aromatibus/mkcidr
 さて、アクセス制限はできました。が、しかし
 「[世界の国別 IPv4 アドレス割り当てリスト][]」（ありがとうございます！）から
 ダウンロードさせて頂くCIDRリストってなんぞ？となりました。
+
+<!-- markdownlint-disable-next-line MD034 -->
+http://nami.jp/ipv4bycc/
+
 そして調べてみたところ
 
 :::note question
 これ自分で作れないかな？
 :::
-となりました（平常運転）
+となりました。
+
+また、「[Office Nami][]」様が善意で公開されている「[世界の国別 IPv4 アドレス割り当てリスト][]」は自身の注意書きにあるとおり公開停止されてしまうこともあります。
+そのような事があっても自前で準備できれば安心です。
 
 ## ◇Pythonで実装
 
-今回の目的「[世界の国別 IPv4 アドレス割り当てリスト][]」からダウンロードできる`cidr.txt`と同等なファイルは
-`\ip-lists\ipv4\_CIDR.ipv4`です。
+今回の目的「[世界の国別 IPv4 アドレス割り当てリスト][]」からダウンロードできる`cidr.txt`と同等なファイルは`\ip-lists\ipv4\_CIDR.ipv4`です。
 
 それぞれ作成されるファイルについて説明いたします。
 まず、プログラムファイルと同階層に`\ip-lists\`フォルダが作成されます。
@@ -69,8 +75,7 @@ https://github.com/Aromatibus/mkcidr
 統合されたファイルは`_CIDR.ipv4`と`_CIDR.ipv6`です。
 
 残る`_Same_RIR.ipv*`ですがこれは管理する5つの団体同士でIPアドレスの譲渡が行われており日によって同じIPアドレスが別の団体のファイルに存在することがあるからです。
-同じIPアドレスが見つかった場合は`_Same_RIR.ipv*`にそのアドレスデータが保存されるようになっています。
-
+同じIPアドレスが見つかった場合は`_Same_RIR.ipv*`にそのアドレスデータが保存されるようになっています。およそ数日で解消されます。
 
 <!-- markdownlint-disable-next-line MD034 -->
 https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
@@ -108,5 +113,7 @@ NURO光を使ってるんですがWebページの作成など色々と試す前�
 [5分で理解するfail2ban]: https://qiita.com/Brutus/items/28f4dc2054ad7de54e73
 [Nginxで国外からのWEBアクセスを遮断]: https://qiita.com/KensukeSakakibara/items/27d15975c754758321ad
 [【Cent OS 6.x】国単位でIPをブロックするスクリプト with ipset]: https://qiita.com/R123/items/dc82461ad127c5ea0703
+
+[Office Nami]: http://nami.jp/
 [世界の国別 IPv4 アドレス割り当てリスト]: http://nami.jp/ipv4bycc/
 [Google Gemini]: https://gemini.google.com/
