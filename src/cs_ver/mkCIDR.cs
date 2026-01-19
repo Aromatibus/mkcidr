@@ -12,7 +12,9 @@ namespace RirToCidrConverter
     {
         // Python版をAIでC#に変換しエラー処理追加、修正、最適化
 
-        // --- 設定定数 ---
+        // 2026-01-19 未完
+
+        //  --- 設定定数 ---
         private static readonly int allowTimeMin = 18 * 60; // 再ダウンロード許可時間 (分)
         private static readonly int MaxRetryCount = 3;      // 再ダウンロード試行回数
         private static readonly int RetryWaitSeconds = 10;  // ダウンロード失敗時の待機時間（秒）

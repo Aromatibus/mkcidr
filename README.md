@@ -85,6 +85,10 @@ https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
 
 ## ◇C#で実装
 
+:::note alert
+※再度確認したところCIDR変換処理が正しくありませんでしたがそのまま掲載しておきます。
+:::
+
 最近は[Google Gemini][]などAIを使ってプログラムを組むのも当たり前？になりました。
 言語変換もできるかな？と試したところ思いの外良い結果がでました。
 当然ですがC#の方が処理は早かったですね。
