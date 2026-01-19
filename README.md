@@ -748,6 +748,7 @@ NURO光を使ってるんですがWebページの作成など色々と試す前�
 <https://github.com/Aromatibus/>
 
 [Aromatibus/mkcidr]: https://github.com/Aromatibus/mkcidr
+[rir-samechk.py]: https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
 [バッチファイル]: https://github.com/Aromatibus/mkcidr/blob/main/src/cs_ver/CSC_Http_CLI64_DragDropHere.bat
 [Server World]: https://www.server-world.info/
 [Fail2Ban : 侵入防止システム]: https://www.server-world.info/query?os=CentOS_Stream_9&p=fail2ban
@@ -756,4 +757,3 @@ NURO光を使ってるんですがWebページの作成など色々と試す前�
 [【Cent OS 6.x】国単位でIPをブロックするスクリプト with ipset]: https://qiita.com/R123/items/dc82461ad127c5ea0703
 [世界の国別 IPv4 アドレス割り当てリスト]: http://nami.jp/ipv4bycc/
 [Google Gemini]: https://gemini.google.com/
-[rir-samechk.py]: https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
