@@ -86,7 +86,8 @@ https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
 ## ◇C#で実装
 
 :::note alert
-※再度確認したところCIDR変換処理が正しくありませんでしたがそのまま掲載しておきます。
+※再確認したところCIDR変換処理が正しくありませんでした。
+並列処理などは動いているので参考のためそのまま掲載しておきます。
 :::
 
 最近は[Google Gemini][]などAIを使ってプログラムを組むのも当たり前？になりました。
