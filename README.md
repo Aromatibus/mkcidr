@@ -1,6 +1,9 @@
-# RIR ip list to cidr
+# 国外からのサーバーアクセスを遮断するCIDRリストを自前で作成してみる
 
 ## ◇はじめに
+
+GITHUBで公開しています。
+[Aromatibus/mkcidr]
 
 :::note warn
 ※注　前置きが長いので興味無い方は読み飛ばし推薦です
@@ -15,35 +18,33 @@
 
 ※準備中、[Server World][]様には大変お世話になりました。ありがとうございます！！
 
-## ◇不正アクセスの多いこと多いこと（驚）
+## ◇不正アクセスの多いこと多いこと
 
 外部からのアクセスを解放して数時間後だったと思います。
-なんとなくアクセスログを見てしまったんです。
-すると驚いたことにsshへの不正アクセスが大量に検知されていました。
-たった数時間なのにあまりの多さに超驚きました。
-さらに調べてみるとアクセスは国外の特定の地域からであることがわかりました。
-そこで不正アクセスを次の方法で遮断することにしました。
+なんとなくアクセスログを見たところsshへの不正アクセスが大量に検知されていました。
+たった数時間なのにあまりの多さに驚愕しました。
+さらに調べてみるとアクセスは国外のまとまった地域からであることがわかりました。
+そこで不正アクセスを次の記事を参考に遮断することにしました。
 
-- Fail2Ban
-  - [Fail2Ban : 侵入防止システム][]
+- 不正アクセスを遮断
+  - [Server World][]様の記事から[Fail2Ban : 侵入防止システム][]
   - [5分で理解するfail2ban][]
-- ipset
+- 国外からのアクセスを遮断
   - [Nginxで国外からのWEBアクセスを遮断][]
   - [【Cent OS 6.x】国単位でIPをブロックするスクリプト with ipset][]
 
 ## ◇そして盛大な寄り道へ
 
-さて、アクセス制限はできました。
-が、[世界の国別 IPv4 アドレス割り当てリスト][]からダウンロードさせて頂くCIDRってなんぞ？
-
+さて、アクセス制限はできました。が、
+[世界の国別 IPv4 アドレス割り当てリスト][]からダウンロードさせて頂くCIDRリストってなんぞ？からの
 :::note question
 これ自分で作れないかな？
 :::
-と考えました。
+となりました（平常運転）
 
 ## ◇Pythonで実装
 
-これ作っている時が一番楽しかったかもしれない（楽）
+これを作っている時が一番楽しかったかもしれない！
 
 <!-- markdownlint-disable MD033 -->
 <details><summary>mkcidr.py</summary>
@@ -372,15 +373,18 @@ if __name__ == "__main__":
 ## ◇C#で実装
 
 最近は[Google Gemini][]などAIを使ってプログラムを組むのも当たり前？になりました。
-そこで言語変換もできるかな？と試したところ思いの外良い結果がでました。
-更に改良したものを掲載します。
-※この記事のきっかけです！
+言語変換もできるかな？と試したところ思いの外良い結果がでました。
+そこで更に改良したものを掲載します。
+
+※実はこの記事のきっかけです。
 
 ◯コマンドラインからコンパイルする場合は次のとおりにしてください
-```
+
+[Aromatibus/mkcidr][]に[バッチファイル][]もあります。
+
+```BAT
 C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /r:System.Net.Http.dll mkcidr.cs
 ```
-
 
 <!-- markdownlint-disable MD033 -->
 <details><summary>mkcidr.cs</summary>
@@ -726,12 +730,17 @@ namespace RirToCidrConverter
 </details>
 <!-- markdownlint-enable MD033 -->
 
-## ◇おわり
+## ◇おわりに
 
-お粗末様でした。
+NURO光を使ってるんですがWebページの作成など色々と試す前に突然、MAP-Eへ変更により外部からのアクセスができなくなりました。
+トンネルを使う方法やルーターの対応如何では公開も可能なようですが、NURO光では絶望的という意見が多いようです。
+そもそもNURO光は確保しているIP4アドレスが少ないらしく今後、公開サーバーの運用はほぼ絶望的みたいですね。
+乗り換えを考えていますが今後はMAP-Eが当たり前になってしまうんだろうか・・・
 
 <https://github.com/Aromatibus/>
 
+[Aromatibus/mkcidr]: https://github.com/Aromatibus/mkcidr
+[バッチファイル]: https://github.com/Aromatibus/mkcidr/blob/main/src/cs_ver/CSC_Http_CLI64_DragDropHere.bat
 [Server World]: https://www.server-world.info/
 [Fail2Ban : 侵入防止システム]: https://www.server-world.info/query?os=CentOS_Stream_9&p=fail2ban
 [5分で理解するfail2ban]: https://qiita.com/Brutus/items/28f4dc2054ad7de54e73
