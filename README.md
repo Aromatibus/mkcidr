@@ -4,6 +4,7 @@
 
 ※本編より並列ダウンロード処理の方が珍しいとのことで並列処理のタグを加筆しました。
 ※プログレスバーによる進捗表示（[rir-samechk.py][]）も実装しているのは見ないそうです。
+※AIでPythonからC#に変換したバージョンはCIDRの処理に誤りがあるためQiitaでの公開停止しました。
 
 GitHubで公開しています。
 <!-- markdownlint-disable-next-line MD034 -->
@@ -82,29 +83,6 @@ http://nami.jp/ipv4bycc/
 
 <!-- markdownlint-disable-next-line MD034 -->
 https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
-
-## ◇C#で実装
-
-:::note alert
-※再確認したところCIDR変換処理が正しくありませんでした。
-並列処理などは動いているので参考のためそのまま掲載しておきます。
-:::
-
-最近は[Google Gemini][]などAIを使ってプログラムを組むのも当たり前？になりました。
-言語変換もできるかな？と試したところ思いの外良い結果がでました。
-当然ですがC#の方が処理は早かったですね。
-そこで更に改良したものを掲載します。
-
-※実はこの記事の載せてみようと思い立ったきっかけです。
-
-- コマンドラインからコンパイルする場合は次のとおりにしてください
-  （GITHUBに[D&Dでコンパイルするバッチファイル][]もあります。）
-
-```BAT
-C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /r:System.Net.Http.dll mkcidr.cs
-```
-<!-- markdownlint-disable-next-line MD034 -->
-https://github.com/Aromatibus/mkcidr/blob/main/src/cs_ver/mkCIDR.cs
 
 ## ◇おわりに
 
