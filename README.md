@@ -96,13 +96,10 @@ NURO光を使ってるんですがWebページの作成など色々と試す前�
 https://github.com/Aromatibus/
 
 [rir-samechk.py]: https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
-[D&Dでコンパイルするバッチファイル]: https://github.com/Aromatibus/mkcidr/blob/main/src/cs_ver/CSC_Http_CLI64_DragDropHere.bat
 [Server World]: https://www.server-world.info/
 [Fail2Ban : 侵入防止システム]: https://www.server-world.info/query?os=CentOS_Stream_9&p=fail2ban
 [5分で理解するfail2ban]: https://qiita.com/Brutus/items/28f4dc2054ad7de54e73
 [Nginxで国外からのWEBアクセスを遮断]: https://qiita.com/KensukeSakakibara/items/27d15975c754758321ad
 [【Cent OS 6.x】国単位でIPをブロックするスクリプト with ipset]: https://qiita.com/R123/items/dc82461ad127c5ea0703
-
 [Office Nami]: http://nami.jp/
 [世界の国別 IPv4 アドレス割り当てリスト]: http://nami.jp/ipv4bycc/
-[Google Gemini]: https://gemini.google.com/
