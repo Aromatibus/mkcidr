@@ -411,7 +411,7 @@ namespace RirToCidrConverter
         // --- 設定定数 ---
         private static readonly int allowTimeMin = 18 * 60; // 再ダウンロード許可時間 (分)
         private static readonly int MaxRetryCount = 3;      // 再ダウンロード試行回数
-        private static readonly int RetryWaitSeconds = 10;  // ダウンロード失敗時の待機秒数
+        private static readonly int RetryWaitSeconds = 10;  // ダウンロード失敗時の待機時間（秒）
         private static readonly string[] ExcludedCountries = { "ZZ" };
         private static readonly string[] RirUrls = {
             "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest",
@@ -468,13 +468,13 @@ namespace RirToCidrConverter
                     Log("Error: Specified number of retries failed. Terminating process.");
                     return;
                 }
+                ConvertRirToCidr();
             }
             else
             {
-                Log("Skip download (within 18 hours).");
+                Log(string.Format("Skip download (within {0:F1} hours).", Math.Ceiling(allowTimeMin / 60.0 * 10) / 10));
             }
 
-            ConvertRirToCidr();
             Log("All processing completed.");
         }
 
