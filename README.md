@@ -33,7 +33,7 @@ http://nami.jp/ipv4bycc/
 
 :::note info
 RIRからCIDRへ変換するプログラムです。
-IP4、IP6の両方を変換、リスト作成します。
+IPv4、IPv6の両方を変換、リスト作成します。
 高速化を狙って並列ダウンロートなど並列処理をしています。
 :::
 
@@ -57,7 +57,7 @@ IP4、IP6の両方を変換、リスト作成します。
 https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
 
 :::note info
-重複アドレスのチェックプログラムです。
+IPv4のみですが重複アドレスのチェックプログラムです。
 プログレスバー進捗表示を実装しています。
 :::
 
@@ -65,7 +65,7 @@ IPアドレスは管理する5つの団体で譲渡されることがありま�
 その際に日によっては同じIPアドレスが別の国に存在することがあります。
 （数日で解消されます）
 それを検出するのが[rir-samechk.py][]です。
-検出結果は`_Same_RIR.ipv*`に保存されます。
+検出結果は`_Same_RIR.ipv4`に保存されます。
 
 <!-- markdownlint-disable-next-line MD034 -->
 https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
