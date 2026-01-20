@@ -6,7 +6,7 @@
 :: 64bit
 set CSC=C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe
 :: C# のコンパイラオプション
-set csc_opt=/r:System.Net.Http.dll
+set csc_opt=/r:System.Net.Http.dll /r:System.Numerics.dll
 
 :: UTF-8などで保存されたバッチファイルのShiftJis対策;
 chcp 65001 > nul

@@ -50,6 +50,7 @@
     "samechk",
     "setlocal",
     "startswith",
+    "Supernet",
     "tqdm",
     "traceback",
     "unfixable",
