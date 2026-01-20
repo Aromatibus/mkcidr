@@ -31,6 +31,10 @@ http://nami.jp/ipv4bycc/
 
 ## ◇Pythonで実装
 
+### ・RIR to CIDR
+<!-- markdownlint-disable-next-line MD034 -->
+https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
+
 :::note info
 RIRからCIDRへ変換するプログラムです。
 IPv4、IPv6の両方を変換、リストを作成します。
@@ -53,8 +57,10 @@ IPv4、IPv6の両方を変換、リストを作成します。
 
 統合されたファイルは`_CIDR.ipv4`と`_CIDR.ipv6`です。
 
+### ・IPv4 Same Checker
+
 <!-- markdownlint-disable-next-line MD034 -->
-https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
+https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
 
 :::note info
 IPv4のみですが重複アドレスのチェックプログラムです。
@@ -66,9 +72,6 @@ IPアドレスは管理する5つの団体で譲渡されることがありま�
 （数日で解消されます）
 それを検出するのが[rir-samechk.py][]です。
 検出結果は`_Same_RIR.ipv4`に保存されます。
-
-<!-- markdownlint-disable-next-line MD034 -->
-https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
 
 ## ◇おわりに
 
