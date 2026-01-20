@@ -63,14 +63,14 @@ IPv4、IPv6の両方を変換、リストを作成します。
 https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
 
 :::note info
-IPv4のみですが重複アドレスのチェックプログラムです。
-プログレスバー進捗表示を実装しています。
+IPv4のみですが重複アドレスをチェックするプログラムです。
+プログレスバーによる進捗表示を実装しています。
 :::
 
-IPアドレスは管理する5つの団体で譲渡されることがあります。
-その際に日によっては同じIPアドレスが別の国に存在することがあります。
+IPアドレスは管理する5つの団体同士で譲渡されることがあります。
+その際に日によって同じIPアドレスが同時に別の国に存在することがあります。
 （数日で解消されます）
-それを検出するのが[rir-samechk.py][]です。
+それをチェックします。
 検出結果は`_Same_RIR.ipv4`に保存されます。
 
 ## ◇おわりに
@@ -81,7 +81,6 @@ IPアドレスは管理する5つの団体で譲渡されることがありま�
 <!-- markdownlint-disable-next-line MD034 -->
 https://github.com/Aromatibus/
 
-[rir-samechk.py]: https://github.com/Aromatibus/mkcidr/blob/main/src/rir-samechk.py
 [Fail2Ban : 侵入防止システム]: https://www.server-world.info/query?os=CentOS_Stream_9&p=fail2ban
 [5分で理解するfail2ban]: https://qiita.com/Brutus/items/28f4dc2054ad7de54e73
 [Nginxで国外からのWEBアクセスを遮断]: https://qiita.com/KensukeSakakibara/items/27d15975c754758321ad
