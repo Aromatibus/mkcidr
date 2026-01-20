@@ -36,6 +36,9 @@ https://github.com/Aromatibus/mkcidr
 <!-- markdownlint-disable-next-line MD034 -->
 https://github.com/Aromatibus/mkcidr/blob/main/src/mkcidr.py
 
+※Qiitaの埋め込み表示制限により200行までしか表示されません。
+　全体はリンク先を直接見てください。
+
 :::note info
 RIRからCIDRへ変換するプログラムです。
 IPv4、IPv6の両方を変換、リストを作成します。
