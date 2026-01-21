@@ -43,6 +43,7 @@
     "pycache",
     "pydocstyle",
     "pylint",
+    "pypackages",
     "pyproject",
     "Qiita",
     "ripencc",
