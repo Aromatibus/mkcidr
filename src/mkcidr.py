@@ -69,7 +69,7 @@ def safe_urlretrieve(url: str, save_path: Path, timeout: int = 60) -> bool:
             log("Security Error: Forbidden URL scheme")
             return False
 
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}) # noqa:S310 Set User-Agent
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}) # noqa:S310
 
         if not _validate_url_scheme(url, req):
             return False
@@ -146,7 +146,11 @@ def _process_rir_line(line: str, reg: str, ipv4_data: dict, ipv6_data: dict) -> 
         return
 
     p: list[str] = line.split("|")
-    if len(p) < MIN_RIR_FIELDS or not p[1] or p[1] == reg or p[1] in EXCLUDED_COUNTRIES or p[3] == "*":
+
+    if (
+        len(p) < MIN_RIR_FIELDS
+        or not p[1] or p[1] == reg or p[1] in EXCLUDED_COUNTRIES or p[3] == "*"
+    ):
         return
 
     cc: str = p[1]
@@ -199,7 +203,6 @@ def write_results(ip_type: str, data: dict) -> None:
     log(f"{ip_type} write start")
     folder: Path = WORKING_DIR / ip_type
     folder.mkdir(parents=True, exist_ok=True)
-
     master_path: Path = folder / f"_CIDR.{ip_type}"
 
     with open(master_path, "w", encoding="utf-8", newline="\n") as f_master:
