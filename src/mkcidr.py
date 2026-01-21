@@ -38,6 +38,7 @@ def log(message: str) -> None:
 
 
 def _validate_url_scheme(url: str, req: urllib.request.Request) -> bool:
+
     if not url.startswith(("http://", "https://")):
         log("Security Error: Forbidden URL scheme")
         return False
@@ -69,7 +70,7 @@ def safe_urlretrieve(url: str, save_path: Path, timeout: int = 60) -> bool:
             log("Security Error: Forbidden URL scheme")
             return False
 
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}) # noqa:S310
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})  # noqa:S310
 
         if not _validate_url_scheme(url, req):
             return False
