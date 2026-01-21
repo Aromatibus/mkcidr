@@ -18,11 +18,11 @@ from pathlib import Path
 
 # Regional Internet Registry (RIR) URLs
 RIR_URLS: list[str] = [
-    "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest",
-    "http://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest",
-    "http://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest",
-    "http://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest",
-    "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest",
+    "https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest",
+    "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest",
+    "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest",
+    "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest",
+    "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest",
 ]
 # Excluded countries for IP address lists
 EXCLUDED_COUNTRIES: set[str] = {"ZZ"}

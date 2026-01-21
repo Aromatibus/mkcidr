@@ -115,15 +115,15 @@ def rir_same_checker_ipv4(check_list: list[str]) -> None:
 if __name__ == "__main__":
     # RIR: Regional Internet Registry
     # APNIC: Asia Pacific Network Information Centre
-    APNIC = "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
+    APNIC = "https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
     # ARIN: American Registry for Internet Numbers
-    ARIN = "http://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
+    ARIN = "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     # RIPE: Reseaux IP Europeens Network Coordination Centre
-    RIPENCC = "http://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
+    RIPENCC = "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
     # LACNIC: The Latin American and Caribbean IP address Regional Registry
-    LACNIC = "http://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
+    LACNIC = "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     # AfriNIC: African Network Information Centre
-    AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
+    AfriNIC = "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
 
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
@@ -132,15 +132,13 @@ if __name__ == "__main__":
 
     setup_logger()
 
-    print("Extract duplicate listings from RIR data")
-    print("")
+    print("Extract duplicate listings from RIR data\n")
 
     if not Path_IP_LISTS.exists():
         Path_IP_LISTS.mkdir(parents=True)
 
     if not os.access(Path_IP_LISTS, os.W_OK):
-        print("You do not have write permission to the /var/ directory.")
-        print("")
+        print("You do not have write permission to the /var/ directory.\n")
         sys.exit(1)
 
     os.chdir(Path_IP_LISTS)

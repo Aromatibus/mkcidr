@@ -263,16 +263,15 @@ def concatenate_ipv6_country_files() -> None:
 if __name__ == "__main__":
     # RIR: Regional Internet Registry
     # APNIC: Asia Pacific Network Information Centre
-    APNIC = "http://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
+    APNIC = "https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
     # ARIN: American Registry for Internet Numbers
-    ARIN = "http://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
+    ARIN = "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     # RIPE: Reseaux IP Europeens Network Coordination Centre
-    RIPENCC = "http://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
+    RIPENCC = "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
     # LACNIC: The Latin American and Caribbean IP address Regional Registry
-    LACNIC = "http://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
+    LACNIC = "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     # AfriNIC: African Network Information Centre
-    AfriNIC = "http://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
-
+    AfriNIC = "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
     RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
     EXCLUDED_COUNTRIES = ["ZZ"]
 
