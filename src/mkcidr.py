@@ -2,8 +2,6 @@
 
 """Convert RIR IP address lists to CIDR format."""
 
-# I reviewed everything with the help of AI.
-
 # The library "concurrent.futures" is available in Python version 3.2 or later
 # and has been tested with Python 3.10.
 # https://docs.python.org/ja/3/library/concurrent.futures.html
@@ -37,33 +35,6 @@ def log(message: str) -> None:
     print(f"[{timestamp}] {message}")
 
 
-def _validate_url_scheme(url: str, req: urllib.request.Request) -> bool:
-
-    if not url.startswith(("http://", "https://")):
-        log("Security Error: Forbidden URL scheme")
-        return False
-
-    parsed_url = urllib.parse.urlparse(url)
-    if parsed_url.scheme not in ("http", "https"):
-        log(f"Security Error: Forbidden URL scheme: {parsed_url.scheme}")
-        return False
-
-    if req.type not in ("http", "https"):
-        log(f"Security Error: Invalid request scheme: {req.type}")
-        return False
-
-    final_scheme = urllib.parse.urlparse(req.full_url).scheme
-    if final_scheme not in ("http", "https"):
-        log(f"Security Error: Final URL scheme check failed: {final_scheme}")
-        return False
-
-    if not req.full_url.startswith(("http://", "https://")):
-        log("Security Error: URL scheme validation failed before urlopen")
-        return False
-
-    return True
-
-
 def safe_urlretrieve(url: str, save_path: Path, timeout: int = 60) -> bool:
     try:
         if not url.startswith(("http://", "https://")):
@@ -71,9 +42,6 @@ def safe_urlretrieve(url: str, save_path: Path, timeout: int = 60) -> bool:
             return False
 
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})  # noqa:S310
-
-        if not _validate_url_scheme(url, req):
-            return False
 
         opener = urllib.request.build_opener()
         with opener.open(req, timeout=timeout) as response, open(save_path, "wb") as f:
