@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-
-# Extract data for the same IP address from the RIR list
+#!/usr/bin/env python3.10
 
 import os
 import sys
@@ -9,13 +7,12 @@ from logging import INFO, FileHandler, Formatter, StreamHandler, getLogger
 from pathlib import Path
 from urllib.parse import urlparse
 
-import pandas as pd
 import tqdm
 
 
 def setup_logger(log_file: str = "") -> None:
     handler = StreamHandler() if log_file == "" else FileHandler(log_file)
-    handler.setFormatter(  # type: ignore
+    handler.setFormatter(
         Formatter(
             fmt="[%(asctime)s] %(threadName)s - %(message)s",
             datefmt="%Y/%m/%d-%H:%M:%S",
@@ -23,128 +20,125 @@ def setup_logger(log_file: str = "") -> None:
     )
     logger = getLogger()
     logger.setLevel(INFO)
-    logger.addHandler(handler)  # type: ignore
+    logger.addHandler(handler)
 
 
 def change_rir_format(line: str) -> str:
-    params = line.split("|")
-    params[0], params[1], params[2], params[3], params[4] = (
-        params[3],
-        params[4],
-        params[0],
-        params[1],
-        params[2],
-    )
-    return "|".join(params[0:8])
+    params = line.strip().split("|")
+    # params[0:5] -> registry, cc, type, start, value
+    # Reorder to: start, value, registry, cc, type
+    new_params = [params[3], params[4], params[0], params[1], params[2]]
+    new_params.extend(params[5:8])
+    return "|".join(new_params)
 
 
 def restore_rir_format(line: str) -> str:
     params = line.split("|")
-    params[0], params[1], params[2], params[3], params[4] = (
-        params[2],
-        params[3],
-        params[4],
-        params[0],
-        params[1],
-    )
-    return "|".join(params[0:8])
+    # Restore from: start, value, registry, cc, type
+    # Back to: registry, cc, type, start, value
+    restored = [params[2], params[3], params[4], params[0], params[1]]
+    restored.extend(params[5:8])
+    return "|".join(restored)
 
 
-def rir_load_reformat_ipv4(RIR_URLs: list[str], EXCLUDED_COUNTRIES: list[str]) -> list[str]:
-    getLogger().info("RIR Same Checker ipv4 : start")
+def rir_load_reformat_ipv4(rir_urls: list[str], excluded_countries: list[str]) -> list[str]:
+    logger = getLogger()
+    logger.info("RIR Same Checker ipv4 : start")
     check_list: list[str] = []
-    check_list_append = check_list.append
-    getLogger().info("RIR Same Checker ipv4 : Load RIR")
-    for rir_url in RIR_URLs:
+    excluded_set = set(excluded_countries)
+
+    logger.info("RIR Same Checker ipv4 : Load RIR")
+    for rir_url in rir_urls:
         rir_filename = Path(urlparse(rir_url).path).name
         rir_registry = rir_filename.split("-")[1]
-        rir_path = Path.cwd().resolve() / rir_filename
-        with Path(rir_path).open() as file:
+        rir_path = Path.cwd() / rir_filename
+
+        if not rir_path.exists():
+            logger.warning("File not found: %s", rir_path)
+            continue
+
+        with rir_path.open(encoding="utf-8") as file:
             for line in file:
-                if line.startswith("#"):
+                if line.startswith("#") or not line.strip():
                     continue
                 params = line.split("|")
-                if params[1] == "" or params[1] == rir_registry:
+                if len(params) < 7:
                     continue
-                if params[1] in EXCLUDED_COUNTRIES:
+                if params[1] in ("", rir_registry) or params[1] in excluded_set:
                     continue
                 if params[3] == "*":
                     continue
                 if params[2] == "ipv4":
-                    required_param = change_rir_format(line)
-                    check_list_append(required_param)
+                    check_list.append(change_rir_format(line))
+
     check_list.sort()
     return check_list
 
 
 def rir_same_checker_ipv4(check_list: list[str]) -> None:
-    getLogger().info("RIR Same Checker ipv4 : Same Check Start")
-    path_ipv4 = Path.cwd().resolve() / "ipv4"
+    logger = getLogger()
+    logger.info("RIR Same Checker ipv4 : Same Check Start")
+    path_ipv4 = Path.cwd() / "ipv4"
     path_ipv4.mkdir(parents=True, exist_ok=True)
+
     same_list: list[str] = []
-    same_list_append = same_list.append
-    if str(check_list[0].split("|")[0]) == str(check_list[1].split("|")[0]):
-        required_param = restore_rir_format(check_list[0])
-        same_list.append(required_param)
-    for line in tqdm.tqdm(check_list):
-        if str(line.split("|")[0]) == str(
-            check_list[check_list.index(line) - 1].split("|")[0],
-        ):
-            required_param = restore_rir_format(line)
-            same_list_append(required_param)
-            continue
-        if line == check_list[-1]:
-            continue
-        if str(line.split("|")[0]) == str(
-            check_list[check_list.index(line) + 1].split("|")[0],
-        ):
-            required_param = restore_rir_format(line)
-            same_list_append(required_param)
-            continue
-    getLogger().info("RIR Same Checker ipv4 : Write File")
-    with Path(path_ipv4 / "_Same_RIR.ipv4").open(
-        mode="w",
-        encoding="utf-8",
-        newline="\n",
-    ) as outfile:
+    n = len(check_list)
+    if n < 2:
+        logger.info("No data to check.")
+        return
+
+    # Optimized duplicate check: compare with neighbors in O(n)
+    for i in tqdm.tqdm(range(n)):
+        current_ip = check_list[i].split("|")[0]
+        is_same = False
+
+        if i > 0 and current_ip == check_list[i - 1].split("|")[0]:
+            is_same = True
+        elif i < n - 1 and current_ip == check_list[i + 1].split("|")[0]:
+            is_same = True
+
+        if is_same:
+            same_list.append(restore_rir_format(check_list[i]))
+
+    logger.info("RIR Same Checker ipv4 : Write File")
+    output_file = path_ipv4 / "_Same_RIR.ipv4"
+    with output_file.open(mode="w", encoding="utf-8", newline="\n") as outfile:
         for line in same_list:
-            outfile.write(line)
-    getLogger().info("Number of the same address : %s", int(len(same_list) / 2))
-    getLogger().info("RIR Same Checker ipv4 : end")
+            outfile.write(f"{line}\n")
+
+    logger.info("Number of the same address units : %d", len(same_list) // 2)
+    logger.info("RIR Same Checker ipv4 : end")
+
+
+def main() -> None:
+    # RIR URLs
+    RIR_URLS = [
+        "https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest",
+        "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest",
+        "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest",
+        "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest",
+        "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest",
+    ]
+    EXCLUDED_COUNTRIES = ["ZZ"]
+    PATH_IP_LISTS = Path(__file__).parent / "ip-lists"
+
+    setup_logger()
+    print("Extract duplicate listings from RIR data\n")
+
+    try:
+        PATH_IP_LISTS.mkdir(parents=True, exist_ok=True)
+        os.chdir(PATH_IP_LISTS)
+    except OSError as e:
+        print(f"Directory error: {e}")
+        return
+
+    start_time = time.time()
+    data = rir_load_reformat_ipv4(RIR_URLS, EXCLUDED_COUNTRIES)
+    if data:
+        rir_same_checker_ipv4(data)
+
+    print(f"processing time : {time.time() - start_time:,.2f} sec")
 
 
 if __name__ == "__main__":
-    # RIR: Regional Internet Registry
-    # APNIC: Asia Pacific Network Information Centre
-    APNIC = "https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest"
-    # ARIN: American Registry for Internet Numbers
-    ARIN = "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
-    # RIPE: Reseaux IP Europeens Network Coordination Centre
-    RIPENCC = "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
-    # LACNIC: The Latin American and Caribbean IP address Regional Registry
-    LACNIC = "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
-    # AfriNIC: African Network Information Centre
-    AfriNIC = "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
-    RIR_URLs = [APNIC, ARIN, RIPENCC, LACNIC, AfriNIC]
-    EXCLUDED_COUNTRIES = ["ZZ"]
-
-    Path_IP_LISTS = Path(__file__).parent / "ip-lists"
-
-    setup_logger()
-
-    print("Extract duplicate listings from RIR data\n")
-
-    if not Path_IP_LISTS.exists():
-        Path_IP_LISTS.mkdir(parents=True)
-
-    if not os.access(Path_IP_LISTS, os.W_OK):
-        print("You do not have write permission to the /var/ directory.\n")
-        sys.exit(1)
-
-    os.chdir(Path_IP_LISTS)
-
-    start = time.time()
-    rir_same_checker_ipv4(rir_load_reformat_ipv4(RIR_URLs, EXCLUDED_COUNTRIES))
-    print(f"processing time : {time.time() - start:,.2f} sec")
-
-    sys.exit(0)
+    main()
